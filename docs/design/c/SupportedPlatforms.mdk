@@ -1,0 +1,53 @@
+## Supported "C" programming language standard {#clang-supported-language}
+
+~ Must 
+implement your APIs in [C99](https://en.wikipedia.org/wiki/C99) to ensure maximum portability of your code.  While MSVC supports most C99 features, it is not fully compatible with C99 yet.  If using MSVC (or if Windows is required), ensure you avoid non-supported C99 features in MSVC.
+~
+
+## Supported platforms and compilers {#clang-supported-platforms}
+
+~ Should
+minimally support the following platforms and associated compiled when implementing your client library.
+
+~ TableFigure {#clang-supported-platforms-table, caption: "Supported Platforms and Compilers"}
+| Operating System    | Architecture | Compiler                                |
+|---------------------|:------------:|:----------------------------------------|
+| Ubuntu 16.04 (LTS)  | x64          | gcc-5.4.0                               |
+| Ubuntu 18.04 (LTS)  | x86          | gcc-7.3                                 |
+| Ubuntu 18.04 (LTS)  | x64          | Clang 6.0.x                             |
+| OSX 10.13.4         | x64          | XCode 9.4.1                             |
+| Windows Server 2016 | x86          | MSVC 14.16.x                            |
+| Windows Server 2016 | x64          | MSVC 14.16.x                            |
+| Debian 9 Stretch    | x64          | gcc-7.x                                 |
+~
+
+~ ToDo
+This is based on versions supported by the Azure IoT SDK for C.  More investigation is needed to ensure it is up to date.  We need to make sure the version supported is the latest long term servicing with wide adoption available for each platform.  Suggested additions: RHEL 8 (gcc 8.2.1) and Fedora (30 with gcc 9.1.1) + Alpine.  Windows Server 2016 includes Windows 8 - should we switch?
+~
+
+~
+
+~ ToDo
+provide common flags to use with each compiler.
+~
+
+~ ShouldNot
+rely on any compiler extensions to ensure maximum portability of your code.  Examples of extensions to avoid include:
+
+* [MSVC compiler extensions](https://docs.microsoft.com/en-us/cpp/build/reference/microsoft-extensions-to-c-and-cpp?view=vs-2019)
+* [Clang language extensions](https://clang.llvm.org/docs/LanguageExtensions.html)
+* [GNU C compiler extensions](https://gcc.gnu.org/onlinedocs/gcc/C-Extensions.html)
+
+Use the appropriate options for each compiler to prevent the use of such extensions.
+~
+
+~ Must
+use appropriate compiler flags to identify warnings.
+
+~ TableFigure {#clang-compiler-warnings, caption: "Warning flags to use on compilers"}
+| Compiler                 | Compiler Flags   |
+|:-------------------------|------------------|
+| gcc                      | `-Wall -Wextra`  |
+| Clang and XCode          | `-Weverything`   |
+| MSVC                     | `/W4`            |
+~

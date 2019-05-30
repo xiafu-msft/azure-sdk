@@ -1,0 +1,85 @@
+Madoko documentation: http://madoko.org/reference.html
+
+Title       : Azure SDK Design Guidelines for the C Language
+Title Note  : Version 1.0.0
+Author      : Adrian Hall
+Affiliation : Azure SDK Team / PM
+Email       : adrian.hall@microsoft.com
+Author      : Mahmoud Saleh
+Affiliation : Visual C++ Team
+Email       : mahmoud.saleh@microsoft.com
+Author      : Gor Nishanov
+Affiliation : Visual C++ Team
+Email       : gor.nishanov@microsoft.com
+Logo        : False
+Embed       : False
+css         : custom.css
+
+[INCLUDE=../components.mdk]
+
+[TITLE]
+
+# Azure SDK design guidelines for the C language { -;  toc-line: '' }
+
+This document describes the architectural considerations and API design guidelines for the Azure SDK client libraries written in C.  The primary focus of these guidelines is to ensure that a client library developer can write code that targets the Azure supported IoT platforms.
+
+[TOC]
+
+# Introduction
+
+[INCLUDE=../general/DesignPrinciples.mdk]
+[INCLUDE=../general/Terminology.mdk]
+[INCLUDE=../general/Process.mdk]
+[INCLUDE=../general/OpenSource.mdk]
+
+[INCLUDE=./CodingStandards.mdk]
+
+# The Client library
+
+[INCLUDE=./SupportedPlatforms.mdk]
+
+## The API surface {#clang-apisurface}
+
+The API surface of your client library must have the most thought as it is the primary interaction that the consumer has with your service.  
+
+[INCLUDE=./Namespace.mdk]
+[INCLUDE=../general/APIShape.mdk]
+[INCLUDE=../general/ResponseFormats.mdk]
+[INCLUDE=../general/Pagination.mdk]
+[INCLUDE=../general/OtherProtocols.mdk]
+
+## Implementing the API {#general-implementing}
+
+Once you have worked through an acceptable API surface, you can start implementing the service clients.
+
+[INCLUDE=../general/Configuration.mdk]
+[INCLUDE=../general/ParameterValidation.mdk]
+[INCLUDE=../general/PipelineUsage.mdk]
+[INCLUDE=../general/APIGeneral.mdk]
+[INCLUDE=../general/Errors.mdk]
+[INCLUDE=../general/Logging.mdk]
+[INCLUDE=../general/DistributedTracing.mdk]
+[INCLUDE=../general/Dependencies.mdk]
+[INCLUDE=../general/CommonLibrary.mdk]
+[INCLUDE=../general/Documentation.mdk]
+
+# Releasing your Client library
+
+Releasing your client library requires coordination between several groups, including the Azure SDK engineering systems, service, support, and documentation teams.  
+
+[INCLUDE=../general/Releasing.mdk]
+[INCLUDE=../general/Versioning.mdk]
+
+# Appendix: Azure Core
+
+Azure Core is a library that provides common services to other client libraries.  These services include:
+
+* [The HTTP pipeline](#azurecore-http-pipeline)
+* [Global configuration](#azurecore-configuration)
+* [Credentials](#azurecore-credentials)
+
+The following sections define the requirements for the Azure Core library.  If you are implementing a client library in a language that already has an Azure Core library, you do not need to read this section.  It is primarily targeted at developers who work on the Azure Core library.
+
+[INCLUDE=../general/AzureCorePipeline.mdk]
+[INCLUDE=../general/AzureCoreConfiguration.mdk]
+[INCLUDE=../general/AzureCoreCredentials.mdk]
