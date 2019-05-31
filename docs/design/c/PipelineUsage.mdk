@@ -1,0 +1,5 @@
+[INCLUDE=../general/PipelineUsage.mdk]
+
+~ ToDo
+There is no HTTP pipeline within the Azure Core library (since it does not exist yet)
+~

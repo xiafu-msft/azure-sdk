@@ -1,0 +1,10 @@
+## Azure Core Pipeline
+
+~ ToDo
+Write the specs for Azure Core
+~
+
+Some to dos (notes from preparing the guidelines):
+
+* Implement HTTP with libcurl / libuv
+* Implement HTTP Timeouts using [CURLOPT_TTIMEOUT_MS](https://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTTIMEOUT).

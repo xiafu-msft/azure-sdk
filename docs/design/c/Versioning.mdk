@@ -1,0 +1,23 @@
+[INCLUDE=../general/Versioning.mdk]
+
+### C language specifics
+
+~ Must
+include a `SHORTNAME_VERSIONINFO` definition in the main header file that defines the current version of the library.
+~
+
+~ Must
+include a `SHORTNAME_SERVICEVERSION` definition in the main header file that defines the API version of the service that is targetted by the library if the service supports different concurrent versions on the REST API.
+~
+
+Example:
+
+```c
+#ifndef azure_devicetwin_h
+#define azure_devicetwin_h
+
+#define DEVICETWIN_VERSIONINFO "1.0.0"
+#define DEVICETWIN_SERVICEVERSION "2018-11-28"
+
+#endif /* azure_devicetwin_h */
+```

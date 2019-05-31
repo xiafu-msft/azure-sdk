@@ -1,0 +1,51 @@
+### Response formats {#general-responses}
+
+Requests to the service fall into two basic groups - methods that make a single logical request, or a deterministic sequence of requests.  An example of a *single logical request* is a request that may be retried inside the operation.  An example of a *deterministic sequence of requests* is a paged operation.
+
+The *logical entity* is a protocol neutral representation of a response. For HTTP, the logical entity may combine data from headers, body and the status line. A common example is exposing an ETag header as a property on the logical entity in addition to any deserialized content from the body.
+
+~ Must {#general-return-logical-entities}
+optimize for returning the logical entity for a given request. The logical entity MUST represent the information needed in the 99%+ case.
+~
+
+~ Must {#general-return-expose-raw}
+*make it possible* for a developer to get access to the complete response, including the status line, headers and body. The client library MUST follow the language specific guidance for accomplishing this.
+~
+
+For example, you may choose to do something similar to the following:
+
+```c
+typedef struct _short_item {
+    // JSON decoded structure.
+} SHORT_ITEM;
+
+typedef struct _short_paged_results {
+    uint32 size;
+    SHORT_ITEM *items;
+} *SHORT_PAGED_RESULTS;
+
+
+struct _short_raw_paged_results {
+    HTTP_HEADERS *headers;
+    uint16 status_code;
+    byte *raw_body;
+    SHORT_PAGED_RESULTS results;
+} *SHORT_RAW_PAGED_RESULTS;
+
+SHORT_PAGED_RESULTS short_list_items(client, /* extra params */);
+SHORT_RAW_PAGED_RESULTS short_list_items_with_response(client, /* extra params */);
+```
+
+~ Must {#general-return-document-raw-stream}
+document and provide examples on how to access the raw and streamed response for a given request, where exposed by the client library.  We do not expect all methods to expose a streamed response.
+~
+
+For methods that combine multiple requests into a single call:
+
+~ MustNot {#general-return-no-headers-if-confusing}
+return headers and other per-request metadata unless it is obvious as to which specific HTTP request the methods return value corresponds to.
+~
+
+~ Must {#general-expose-data-for-composite-failures}
+provide enough information in failure cases for an application to take appropriate corrective action.
+~

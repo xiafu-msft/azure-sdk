@@ -1,0 +1,12 @@
+[INCLUDE=../general/Logging.mdk]
+
+### C language specifics
+
+~ Must
+use the Azure Core library for logging purposes.
+~
+
+~ ToDo
+The Azure Core library does not exist yet, so we can't have a run-down of the functionality for Azure Core Logging.  There is also no "standard" logging framework to integrate.
+~
+

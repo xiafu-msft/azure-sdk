@@ -1,0 +1,19 @@
+### Testing {#clang-testing}
+
+We believe testing is a part of the development process, so we expect unit and integration tests to be a part of the source code.
+
+~ Must
+unit test your API with [ccputest](https://cpputest.github.io/), a unit testing and mocking framework for C and C++.
+~
+
+~ Must
+automatically run unit tests when building your client library.
+~
+
+~ Must
+maintain a 80% code coverage with unit tests.
+
+~ ToDo
+is this even a reasonable ask for testing?
+~
+~

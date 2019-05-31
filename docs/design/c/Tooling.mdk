@@ -1,0 +1,49 @@
+### Tooling {#clang-tooling}
+
+We use a common build and test pipeline to provide for automatic distribution of client libraries.  To support this, we need common tooling.
+
+~ Must
+use [CMake](https://cmake.org/) v3.x for your project build system.
+~ ToDo
+there was a reason why CMake 3.x was chosen, and I think the specific version had a reason too - we should document that here.
+~
+~
+
+~ Must
+include the following standard targets:
+
+* `build` to build the library
+* `test` to run the unit test suite
+* `docs` to generate reference documentation
+* `all` to run all three targets
+
+~
+
+Include other targets as they appear useful during the development process.
+
+~ ToDo
+should we be advising the use of valgrind, cppcheck, or other analysis tools (static or dynamic)?
+~
+
+~ Must
+use [clang-format](http://clang.llvm.org/docs/ClangFormat.html) for formatting, with the following command-line options:
+
+```bash
+clang-format -style=llvm -i <file> ...
+```
+
+Using `-i` does an in-place edit of the files for style.  Drop this argument if you intend to adjust style manually.  If using Visual Studio, there is [an extension](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.llvm-toolchain) that binds Ctrl-R Ctrl-F to this operation.
+
+~ ToDo
+decide on exact formatting standards to use and include here.
+~
+~
+
+~ Must
+use [doxygen](https://doxygen.nl) for reference documentation for HTML.
+
+~ ToDo
+we should have a build target and example configuration file for doxygen that the client library developer can just include in their CMakeLists.txt files
+~
+~
+

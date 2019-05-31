@@ -43,6 +43,10 @@ use lower-case for all variable names that would be pushed onto the stack.  This
 ~
 
 ~ Must
+use a single leading underscoe to indicate that a name is not part of the public API and is not guaranteed to be stable.
+~
+
+~ Must
 place the `*` as close to the variable name to indicate a pointer type.  i.e. use `char *name = NULL;`, not `char* name = NULL;`.
 ~
 

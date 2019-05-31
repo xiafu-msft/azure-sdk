@@ -1,0 +1,26 @@
+[INCLUDE=../general/Releasing.mdk]
+
+### C language specifics
+
+~ Should
+provide both dynamic and static linking options for your library.  Each has its own merits and use cases.
+~
+
+~ Must
+publish your package in source code format.  Due to differences in platforms, this is the most common publishing mechanism for C libraries.
+~
+
+~ Must
+publish your package to [vcpkg](https://github.com/Microsoft/vcpkg), a C++ library manager supporting Windows, Linux, and MacOS.
+~
+
+~ Should
+publish libraries targeted to Linux to standard Linux package managers
+~ ToDo
+decide which Linux package managers to support plus which repositories we bless.
+~
+~
+
+~ ToDo
+Decide if we need to publish to GitHub Package Registry.  If we do, then we likely want to do it across all languages.
+~

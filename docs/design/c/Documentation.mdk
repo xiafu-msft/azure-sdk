@@ -1,0 +1,11 @@
+[INCLUDE=../general/Documentation.mdk]
+
+# C language specifics
+
+~ Must
+include docstrings compatible with the [doxygen](http://www.doxygen.nl/index.html) tool for generating reference Documentation
+~
+
+~ Must
+ensure that each sample is executable when compiled by providing a `main()` function.
+~

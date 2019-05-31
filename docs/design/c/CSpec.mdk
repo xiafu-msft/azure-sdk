@@ -43,32 +43,34 @@ This document describes the architectural considerations and API design guidelin
 The API surface of your client library must have the most thought as it is the primary interaction that the consumer has with your service.  
 
 [INCLUDE=./Namespace.mdk]
-[INCLUDE=../general/APIShape.mdk]
-[INCLUDE=../general/ResponseFormats.mdk]
-[INCLUDE=../general/Pagination.mdk]
+[INCLUDE=./APIShape.mdk]
+[INCLUDE=./ResponseFormats.mdk]
+[INCLUDE=./Pagination.mdk]
 [INCLUDE=../general/OtherProtocols.mdk]
 
 ## Implementing the API {#general-implementing}
 
 Once you have worked through an acceptable API surface, you can start implementing the service clients.
 
+[INCLUDE=./Tooling.mdk]
 [INCLUDE=../general/Configuration.mdk]
 [INCLUDE=../general/ParameterValidation.mdk]
-[INCLUDE=../general/PipelineUsage.mdk]
-[INCLUDE=../general/APIGeneral.mdk]
-[INCLUDE=../general/Errors.mdk]
-[INCLUDE=../general/Logging.mdk]
-[INCLUDE=../general/DistributedTracing.mdk]
-[INCLUDE=../general/Dependencies.mdk]
-[INCLUDE=../general/CommonLibrary.mdk]
-[INCLUDE=../general/Documentation.mdk]
+[INCLUDE=./PipelineUsage.mdk]
+[INCLUDE=./APIGeneral.mdk]
+[INCLUDE=./Errors.mdk]
+[INCLUDE=./Logging.mdk]
+<!-- Explicitly Removed -- [INCLUDE=./DistributedTracing.mdk] -->
+[INCLUDE=./Dependencies.mdk]
+<!-- Explicitly Removed -- [INCLUDE=../general/CommonLibrary.mdk] -->
+[INCLUDE=./Testing.mdk]
+[INCLUDE=./Documentation.mdk]
 
 # Releasing your Client library
 
 Releasing your client library requires coordination between several groups, including the Azure SDK engineering systems, service, support, and documentation teams.  
 
-[INCLUDE=../general/Releasing.mdk]
-[INCLUDE=../general/Versioning.mdk]
+[INCLUDE=./Releasing.mdk]
+[INCLUDE=./Versioning.mdk]
 
 # Appendix: Azure Core
 
@@ -77,9 +79,11 @@ Azure Core is a library that provides common services to other client libraries.
 * [The HTTP pipeline](#azurecore-http-pipeline)
 * [Global configuration](#azurecore-configuration)
 * [Credentials](#azurecore-credentials)
+* [Logging](#clang-azurecore-logging)
 
 The following sections define the requirements for the Azure Core library.  If you are implementing a client library in a language that already has an Azure Core library, you do not need to read this section.  It is primarily targeted at developers who work on the Azure Core library.
 
-[INCLUDE=../general/AzureCorePipeline.mdk]
-[INCLUDE=../general/AzureCoreConfiguration.mdk]
-[INCLUDE=../general/AzureCoreCredentials.mdk]
+[INCLUDE=./AzureCorePipeline.mdk]
+[INCLUDE=./AzureCoreConfiguration.mdk]
+[INCLUDE=./AzureCoreCredentials.mdk]
+[INCLUDE=./AzureCoreLogging.mdk]

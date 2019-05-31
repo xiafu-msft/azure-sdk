@@ -1,0 +1,15 @@
+### Pagination {#clang-pagination}
+
+Although object-orientated languages can eschew low-level pagination APIs in favor of high-level abstractions, C acts as a lower level language and thus embraces pagination APIs provided by the service.  You should work within the confines of the paging system provided by the service.
+
+~ Must {#clang-pagination-use-paging}
+export the same paging API as the service provides.
+~
+
+~ Must {#clang-last-page}
+indicate in the return type if the consumer has reached the end of the result set.
+~
+
+~ Must {#clang-size-of-page}
+indicate in the return type how many items were returned by the service, and have a list of those items for the consumer to iterate over.
+~
