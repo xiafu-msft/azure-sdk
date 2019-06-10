@@ -9,3 +9,11 @@ include docstrings compatible with the [doxygen](http://www.doxygen.nl/index.htm
 ~ Must
 ensure that each sample is executable when compiled by providing a `main()` function.
 ~
+
+~ Must
+for any funciton that allocates memory and returns it to the caller document the returned memory's lifetime and ownership
+~
+
+~ Must
+Document how your function can fail, for example if returning an error code document when each possible code will be returned.
+~
