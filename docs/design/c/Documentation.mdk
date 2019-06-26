@@ -7,11 +7,66 @@ include docstrings compatible with the [doxygen](http://www.doxygen.nl/index.htm
 ~
 
 ~ Must
+Format parameter documentation like the following:
+```
+/* <....documentation....>
+* \param[<direction>] <param_name> __<additional_annotations>__ description
+* <....documentation....>
+*/
+```
+
+`<additional_annotations>` is a space seperate list of one of the following annotations:
+
+* [transfer none|container|full|floating]
+* [nullable]
+* [not nullable]
+~
+
+~ Must
+For all parameters that are pointers, or structures/unions containing pointers provide at least a `<direction>`
+and a `[transfer]` annotation.
+~
+
+~ Note
+These annotations are derived from [gobject-introspection-annotations](https://wiki.gnome.org/Projects/GObjectIntrospection/Annotations).
+It's not a big deal that we use that form, it's just critical that there is a standard way to indicate ownership of reference parameters
+~
+
+~ Must
+Provide a target named `doxygen` to build documentation.
+~
+
+Using cmake:
+
+```cmake
+find_package(Doxygen REQUIRED doxygen)
+set(DOXYGEN_GENERATE_HTML YES)
+set(DOXYGEN_GENERATE_XML YES)
+set(DOXYGEN_OPTIMIZE_OUTPUT_FOR_C YES)
+set(DOXYGEN_EXTRACT_PACKAGE YES)
+
+doxygen_add_docs(doxygen
+    ${PROJECT_SOURCE_DIR/src}
+    ${PROJECT_SOURCE_DIR/inc}
+    COMMENT "generate docs")
+```
+
+Notice that:
+* We use find_package() to find doxygen
+* Use the `DOXYGEN_<PREF>` cmake variables instead of writing your own doxyfile
+* Set `OPTIMIZE_OUTPUT_FOR_C` in order to get more C appropriate output.
+* use `doxygen_add_docs` to add the target, this will generate a doxyfile for you.
+
+~ Must
 ensure that each sample is executable when compiled by providing a `main()` function.
 ~
 
 ~ Must
-for any funciton that allocates memory and returns it to the caller document the returned memory's lifetime and ownership
+Provide a cmake option of the form `<SDK_NAME>_BUILD_EXAMPLES` that includes all examples in the build.
+~
+
+~ MustNot
+Install examples by default
 ~
 
 ~ Must
