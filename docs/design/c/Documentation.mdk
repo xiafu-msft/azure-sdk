@@ -4,6 +4,19 @@
 
 ~ Must
 include docstrings compatible with the [doxygen](http://www.doxygen.nl/index.html) tool for generating reference Documentation
+
+For example a (very) simple docstring might look like:
+```
+/**
+ *   @struct az_appconf_client_t
+ *   @brief The az_appconf_client represents the resources required for a connection to
+ *          an azure appconfiguration resource.
+ */
+```
+~
+
+~ Must
+Use doxygen's `\cmd` style docstrings
 ~
 
 ~ Must
@@ -15,16 +28,70 @@ Format parameter documentation like the following:
 */
 ```
 
-`<additional_annotations>` is a space seperate list of one of the following annotations:
+`<additional_annotations>` is a space separated list of one of the following annotations:
 
 * [transfer none|container|full|floating]
 * [nullable]
 * [not nullable]
+* [caller-allocates|callee-allocates]
+
+For example:
+```c++
+/**
+ * @brief execute a blocking get request
+ *	
+ * @memberof az_appconf_client
+ * 
+ * @param[in] client __[transfer none]__
+ * @param[in] path_and_query __[transfer none][not nullable]__ 
+ * 			  The query to execute relative to the base url of the client
+ * @param[out] result __[transfer full][not nullable][calee-allocates]__
+ * @param[out] result_sz __[not nullable]__ size of the result
+ */
+az_appconf_err az_appconf_req_get(
+    az_appconf_client* client, const char* path_and_query, unsigned char** result, size_t* result_sz);
+```
+
+Here we see that the first two parameters are input parameters, with no ownership transfer (that is, they are a "borrow").
+The `result` output parameter is labeled as `[callee-allocates]` because it allocates memory for the output parameter itself.
+Since `result` is owned by the caller after `az_appconf_req_get` returns it's annotated as `[transfer full]`.
+~
+
+~ May
+Assume the following default annotations:
+`[not nullable]`.
+For all `[out]` parameters: `[transfer full]`
+For `[out]` pointer parameters: `[caller-allocates]`.
+For `[out]` pointer-to-pointer parameters: `[callee-allocates]`
 ~
 
 ~ Must
-For all parameters that are pointers, or structures/unions containing pointers provide at least a `<direction>`
-and a `[transfer]` annotation.
+If you have nullable parameters document what happens when they are set to null
+
+For example:
+```c
+/**
+ * @brief get properties of a cat (for example hair color, weight, floof, etc)
+ *
+ * @param[in] cat __[transfer none]__ The cat to operate on
+ * @param[out] props __[nullable][caller-allocates]__ pointer to an array of num_props, or null
+ * @param[in,out] num_props __[non nullable][caller-allocates]__ pointer to the number of properties to
+ *                                                               retrieve or to a location to store the number of
+ *                                                               properties queried as described below
+ *
+ * If @p props is NULL then return the number of properties available in @p num_props,
+ * otherwise return @p num_props into the array at @p props
+ */
+az_error az_catherding_get_cat_properties(cat* cat, cat_properties* props, size_t* num_props);
+```
+
+This function returns an array using all caller allocated memory. In order to figure out the size of the array
+the caller can pass NULL for the array `[out]` parameter. They can then allocate the required memory and call the function
+again.
+~
+
+~ Must
+For all parameters that are pointers, or structures/unions containing pointers provide at least a `<direction>`.
 ~
 
 ~ Note
@@ -63,6 +130,14 @@ ensure that each sample is executable when compiled by providing a `main()` func
 
 ~ Must
 Provide a cmake option of the form `<SDK_NAME>_BUILD_EXAMPLES` that includes all examples in the build.
+
+For example if you keep examples in the `examples` directory you could use:
+
+```cmake
+if(AZURE_APPCONF_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+```
 ~
 
 ~ MustNot
