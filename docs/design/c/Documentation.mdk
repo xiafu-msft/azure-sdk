@@ -16,7 +16,7 @@ For example a (very) simple docstring might look like:
 ~
 
 ~ Must
-Use doxygen's `\cmd` style docstrings
+Use doxygen's `@cmd` style docstrings
 ~
 
 ~ Must
