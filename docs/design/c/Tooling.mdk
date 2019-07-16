@@ -32,7 +32,7 @@ use [clang-format](http://clang.llvm.org/docs/ClangFormat.html) for formatting, 
 clang-format -style=llvm -i <file> ...
 ```
 
-Using `-i` does an in-place edit of the files for style.  Drop this argument if you intend to adjust style manually.  If using Visual Studio, there is [an extension](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.llvm-toolchain) that binds Ctrl-R Ctrl-F to this operation.
+Using `-i` does an in-place edit of the files for style.  Drop this argument if you intend to adjust style manually.  If using Visual Studio, there is [an extension](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.llvm-toolchain) that binds Ctrl-R Ctrl-F to this operation. Additionally Visual Studio 2019 includes this functionality by default.
 
 ~ ToDo
 decide on exact formatting standards to use and include here.
@@ -41,6 +41,25 @@ decide on exact formatting standards to use and include here.
 
 ~ Must
 use [doxygen](https://doxygen.nl) for reference documentation for HTML.
+
+For example in cmake:
+```cmake
+find_package(Doxygen REQUIRED doxygen)
+set(DOXYGEN_GENERATE_HTML YES)
+set(DOXYGEN_GENERATE_XML YES)
+set(DOXYGEN_OPTIMIZE_OUTPUT_FOR_C YES)
+set(DOXYGEN_EXTRACT_PACKAGE YES)
+set(DOXYGEN_SIMPLE_STRUCTS YES)
+set(DOXYGEN_TYPEDEF_HIDES_STRUCT NO)
+
+doxygen_add_docs(doxygen
+	${PROJECT_SOURCE_DIR}/inc
+	${PROJECT_SOURCE_DIR}/src
+	${PROJECT_SOURCE_DIR}/doc
+	COMMENT "generate docs")
+
+```
+~
 
 ~ ToDo
 we should have a build target and example configuration file for doxygen that the client library developer can just include in their CMakeLists.txt files
