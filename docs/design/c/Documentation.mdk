@@ -3,14 +3,14 @@
 # C language specifics
 
 ~ Must
-include docstrings compatible with the [doxygen](http://www.doxygen.nl/index.html) tool for generating reference Documentation
+include docstrings compatible with the [doxygen](http://www.doxygen.nl/index.html) tool for generating reference documentation
 
 For example a (very) simple docstring might look like:
 ```
 /**
  *   @struct az_appconf_client_t
  *   @brief The az_appconf_client represents the resources required for a connection to
- *          an azure appconfiguration resource.
+ *          an Azure AppcConfiguration resource.
  */
 ```
 ~
@@ -28,12 +28,12 @@ Format parameter documentation like the following:
 */
 ```
 
-`<additional_annotations>` is a space separated list of one of the following annotations:
+`<additional_annotations>` is a space-separated list of the following annotations:
 
-* [transfer none|container|full|floating]
-* [nullable]
-* [not nullable]
-* [caller-allocates|callee-allocates]
+* `[transfer none|container|full|floating]`
+* `[nullable]`
+* `[not nullable]`
+* `[caller-allocates|callee-allocates]`
 
 For example:
 ```c++
@@ -59,21 +59,21 @@ Since `result` is owned by the caller after `az_appconf_req_get` returns it's an
 
 ~ May
 Assume the following default annotations:
-`[not nullable]`.
-For all `[out]` parameters: `[transfer full]`
-For `[out]` pointer parameters: `[caller-allocates]`.
-For `[out]` pointer-to-pointer parameters: `[callee-allocates]`
+* `[not nullable]`
+* For all `[out]` parameters: `[transfer full]`
+* For `[out]` pointer parameters: `[caller-allocates]`
+* For `[out]` pointer-to-pointer parameters: `[callee-allocates]`
 ~
 
 ~ Must
-If you have nullable parameters document what happens when they are set to null
+If you have nullable parameters document what happens when they are set to null.
 
 For example:
 ```c
 /**
- * @brief get properties of a cat (for example hair color, weight, floof, etc)
+ * @brief get properties of a cat (e.g. hair color, weight, floof)
  *
- * @param[in] cat __[transfer none]__ The cat to operate on
+ * @param[in] our_cat __[transfer none]__ the cat to operate on
  * @param[out] props __[nullable][caller-allocates]__ pointer to an array of num_props, or null
  * @param[in,out] num_props __[non nullable][caller-allocates]__ pointer to the number of properties to
  *                                                               retrieve or to a location to store the number of
@@ -82,16 +82,16 @@ For example:
  * If @p props is NULL then return the number of properties available in @p num_props,
  * otherwise return @p num_props into the array at @p props
  */
-az_error az_catherding_get_cat_properties(cat* cat, cat_properties* props, size_t* num_props);
+az_error az_catherding_get_cat_properties(cat* our_cat, cat_properties* props, size_t* num_props);
 ```
 
-This function returns an array using all caller allocated memory. In order to figure out the size of the array
+This function returns an array using all caller-allocated memory. In order to figure out the size of the array
 the caller can pass NULL for the array `[out]` parameter. They can then allocate the required memory and call the function
 again.
 ~
 
 ~ Must
-For all parameters that are pointers, or structures/unions containing pointers provide at least a `<direction>`.
+For all parameters that are pointers, or structures/unions containing pointers, provide at least a `<direction>`.
 ~
 
 ~ Note
@@ -103,7 +103,7 @@ It's not a big deal that we use that form, it's just critical that there is a st
 Provide a target named `doxygen` to build documentation.
 ~
 
-Using cmake:
+Using CMake:
 
 ```cmake
 find_package(Doxygen REQUIRED doxygen)
@@ -119,17 +119,17 @@ doxygen_add_docs(doxygen
 ```
 
 Notice that:
-* We use find_package() to find doxygen
-* Use the `DOXYGEN_<PREF>` cmake variables instead of writing your own doxyfile
-* Set `OPTIMIZE_OUTPUT_FOR_C` in order to get more C appropriate output.
-* use `doxygen_add_docs` to add the target, this will generate a doxyfile for you.
+* We use `find_package()` to find doxygen
+* We use the `DOXYGEN_<PREF>` CMake variables instead of writing your own doxyfile
+* We set `OPTIMIZE_OUTPUT_FOR_C` in order to get more C appropriate output.
+* We use `doxygen_add_docs` to add the target, this will generate a doxyfile for you.
 
 ~ Must
-ensure that each sample is executable when compiled by providing a `main()` function.
+Ensure that each sample is executable when compiled by providing a `main()` function.
 ~
 
 ~ Must
-Provide a cmake option of the form `<SDK_NAME>_BUILD_EXAMPLES` that includes all examples in the build.
+Provide a CMake option of the form `<SDK_NAME>_BUILD_EXAMPLES` that includes all examples in the build.
 
 For example if you keep examples in the `examples` directory you could use:
 
