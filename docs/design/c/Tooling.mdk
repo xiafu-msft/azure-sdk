@@ -26,6 +26,66 @@ should we be advising the use of valgrind, cppcheck, or other analysis tools (st
 ~
 
 ~ Must
+Default to hidden visibility when building dynamic libraries. For cmake:
+```cmake
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+```
+
+Then, you can use an export macro to export symbols. For example
+```c
+#ifndef APPCONF_EXPORT_H
+#define APPCONF_EXPORT_H
+
+#ifdef APPCONF_STATIC_DEFINE
+#  define APPCONF_EXPORT
+#  define APPCONF_NO_EXPORT
+#else
+#  ifndef APPCONF_EXPORT
+#    ifdef appconf_EXPORTS
+        /* We are building this library */
+#      define APPCONF_EXPORT 
+#    else
+        /* We are using this library */
+#      define APPCONF_EXPORT 
+#    endif
+#  endif
+
+#  ifndef APPCONF_NO_EXPORT
+#    define APPCONF_NO_EXPORT 
+#  endif
+#endif
+
+#ifndef APPCONF_DEPRECATED
+#  define APPCONF_DEPRECATED 
+#endif
+
+#ifndef APPCONF_DEPRECATED_EXPORT
+#  define APPCONF_DEPRECATED_EXPORT APPCONF_EXPORT APPCONF_DEPRECATED
+#endif
+
+#ifndef APPCONF_DEPRECATED_NO_EXPORT
+#  define APPCONF_DEPRECATED_NO_EXPORT APPCONF_NO_EXPORT APPCONF_DEPRECATED
+#endif
+
+#if 0 /* DEFINE_NO_DEPRECATED */
+#  ifndef APPCONF_NO_DEPRECATED
+#    define APPCONF_NO_DEPRECATED
+#  endif
+#endif
+
+#endif /* APPCONF_EXPORT_H */
+```
+
+CMake can automatically generate an appropriate export header:
+```cmake
+include(GenerateExportHeader)
+generate_export_header(appconf
+    EXPORT_FILE_NAME az/appconf_export.h)
+```
+~
+
+~ Must
 use [clang-format](http://clang.llvm.org/docs/ClangFormat.html) for formatting, with the following command-line options:
 
 ```bash
