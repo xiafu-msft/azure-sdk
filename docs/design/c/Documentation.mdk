@@ -30,10 +30,29 @@ Format parameter documentation like the following:
 
 `<additional_annotations>` is a space-separated list of the following annotations:
 
-* `[transfer none|container|full|floating]`
-* `[nullable]`
-* `[not nullable]`
-* `[caller-allocates|callee-allocates]`
+`[transfer none|full|container|floating]`
+    ~ indicates who owns a parameter and how that ownership is transferred by a given function
+      each ownership transfer mode is defined below. The recipient of a value is the caller for `[callee allocates]` parameters and the callee for `[caller allocates]` parameters
+`[transfer none]`
+    ~ indicates no change in ownership for this parameter. This is sometimes called "borrowing"
+`[transfer full]`
+    ~ indicates complete ownership transfer. After a call to the function the recipient (either the caller or the callee) will be
+      responsible for the value. This usually means the recipient will at least need to arrange for any memory referred to by
+      the value to be freed.
+`[transfer container]`
+    ~ indicates full ownership transfer for a container value, but not for its contents. For example a char** parameter (that referrers to an array of cstrings)
+      would be annotated as `[transfer container]` if the recipient is expected to free the array, but not free each element therein.
+`[nullable]`
+    ~ the parameter may be set to NULL, only valid for pointer parameters/return values. Don't annotate return values or out parameters as `[nullable]`
+      if NULL is used to report errors. If a parameter is marked `[nullable]` document what happens when it is null.
+`[not nullable]`
+    ~ The parameter may not be null.
+`[caller allocates]`
+    ~ memory for the value is expected to be allocated by the caller. This is the default for `[in]` parameters, and `[out]/[in,out]` parameters
+      that have a single indirection (that is `Foo* p` is `[caller allocates]` but `Foo** p` is not).
+`[callee allocates]`
+    ~ memory for the value will be allocated by the callee. This usually means the caller will need to free said memory when it's no longer needed.
+
 
 For example:
 ```c++
@@ -45,7 +64,7 @@ For example:
  * @param[in] client __[transfer none]__
  * @param[in] path_and_query __[transfer none][not nullable]__ 
  * 			  The query to execute relative to the base url of the client
- * @param[out] result __[transfer full][not nullable][calee-allocates]__
+ * @param[out] result __[transfer full][not nullable][callee allocates]__
  * @param[out] result_sz __[not nullable]__ size of the result
  */
 az_appconf_err az_appconf_req_get(
@@ -53,16 +72,18 @@ az_appconf_err az_appconf_req_get(
 ```
 
 Here we see that the first two parameters are input parameters, with no ownership transfer (that is, they are a "borrow").
-The `result` output parameter is labeled as `[callee-allocates]` because it allocates memory for the output parameter itself.
+The `result` output parameter is labeled as `[callee allocates]` because it allocates memory for the output parameter itself.
 Since `result` is owned by the caller after `az_appconf_req_get` returns it's annotated as `[transfer full]`.
 ~
 
 ~ May
 Assume the following default annotations:
 * `[not nullable]`
-* For all `[out]` parameters: `[transfer full]`
-* For `[out]` pointer parameters: `[caller-allocates]`
-* For `[out]` pointer-to-pointer parameters: `[callee-allocates]`
+* For `[caller allocates]` parameters: `[transfer none]`
+* For `[callee allocates]` parameters: `[transfer full]`
+* For `[out]` and `[in,out]` pointer parameters: `[caller allocates]`
+* For `[out]` and `[in,out]` pointer-to-pointer parameters: `[callee allocates]`
+* for `[in]` parameters: `[caller allocates]` (Note: `[callee allocates]` doesn't make sense for `[in]` parameters)
 ~
 
 ~ Must
