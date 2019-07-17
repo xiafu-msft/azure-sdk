@@ -30,7 +30,7 @@ Format parameter documentation like the following:
 
 `<additional_annotations>` is a space-separated list of the following annotations:
 
-* `[transfer none|full|container|floating]`
+* `[transfer none|full|container]`
     : indicates who owns a parameter and how that ownership is transferred by a given function
       each ownership transfer mode is defined below. The recipient of a value is the caller for `[callee allocates]` parameters and the callee for `[caller allocates]` parameters
 * `[transfer none]`
