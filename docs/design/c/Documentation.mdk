@@ -78,6 +78,7 @@ Since `result` is owned by the caller after `az_appconf_req_get` returns it's an
 
 ~ May
 Assume the following default annotations:
+
 * `[not nullable]`
 * For `[caller allocates]` parameters: `[transfer none]`
 * For `[callee allocates]` parameters: `[transfer full]`
