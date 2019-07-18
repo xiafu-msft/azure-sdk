@@ -85,8 +85,7 @@ generate_export_header(appconf
 ```
 
 This is better than writing the export header yourself because cmake knows what to do
-for all platforms/compilers, and what to do if you decide to build a static version
-of your library.
+for all platforms/compilers.
 ~
 
 ~ Must
