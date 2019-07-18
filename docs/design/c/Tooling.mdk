@@ -44,10 +44,10 @@ Then, you can use an export macro to export symbols. For example
 #  ifndef APPCONF_EXPORT
 #    ifdef appconf_EXPORTS
         /* We are building this library */
-#      define APPCONF_EXPORT 
+#      define APPCONF_EXPORT __declspec(dllexport)
 #    else
         /* We are using this library */
-#      define APPCONF_EXPORT 
+#      define APPCONF_EXPORT __declspec(dllimport)
 #    endif
 #  endif
 
@@ -57,7 +57,7 @@ Then, you can use an export macro to export symbols. For example
 #endif
 
 #ifndef APPCONF_DEPRECATED
-#  define APPCONF_DEPRECATED 
+#  define APPCONF_DEPRECATED __declspec(deprecated)
 #endif
 
 #ifndef APPCONF_DEPRECATED_EXPORT
@@ -83,6 +83,10 @@ include(GenerateExportHeader)
 generate_export_header(appconf
     EXPORT_FILE_NAME az/appconf_export.h)
 ```
+
+This is better than writing the export header yourself because cmake knows what to do
+for all platforms/compilers, and what to do if you decide to build a static version
+of your library.
 ~
 
 ~ Must
@@ -121,8 +125,7 @@ doxygen_add_docs(doxygen
 ```
 ~
 
-~ ToDo
-we should have a build target and example configuration file for doxygen that the client library developer can just include in their CMakeLists.txt files
 ~
-~
+
+
 
