@@ -95,7 +95,11 @@ use [clang-format](http://clang.llvm.org/docs/ClangFormat.html) for formatting, 
 clang-format -style=llvm -i <file> ...
 ```
 
-Using `-i` does an in-place edit of the files for style.  Drop this argument if you intend to adjust style manually.  If using Visual Studio, there is [an extension](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.llvm-toolchain) that binds Ctrl-R Ctrl-F to this operation. Additionally Visual Studio 2019 includes this functionality by default.
+Using `-i` does an in-place edit of the files for style.  Drop this argument if you intend
+ to adjust style manually. If using Visual Studio, there is 
+ [an extension](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.llvm-toolchain) 
+ that binds Ctrl-R Ctrl-F to this operation. Additionally Visual Studio 2019 
+ includes this functionality by default.
 
 ~ ToDo
 decide on exact formatting standards to use and include here.
