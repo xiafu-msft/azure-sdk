@@ -2,18 +2,100 @@
 
 We believe testing is a part of the development process, so we expect unit and integration tests to be a part of the source code.
 
+All components must be totally tested, it is highly recommended that the code have 100% of test coverage.
+
+All code should contain, at least, requirements, unit tests, end-to-end tests, and samples. The requirements description should be placed in the unit test file, on top of the test function that verifies the requirement. The unit test name should be placed in the code as a comment, together with the code that implements that functionality. For example:
+
+_*API source code file:*_
+```c
+void foo_tcp_manager_destroy(TCP_HANDLE handle)
+{
+    if(handle == NULL)
+    {
+        /*[foo_tcp_manager_destroy_does_nothing_on_null_handle]*/
+        LogError("handle cannot be NULL");
+    }
+    else
+    {
+        TCP_INSTANCE* instance = (TCP_INSTANCE*)handle;
+
+        /*[foo_tcp_manager_destroy_succeed_on_free_all_resources]*/
+        netif_remove(&(instance->lpc_netif));
+        free(instance);
+    }
+}
+```
+
+_*Unit test file:*_
+```c
+/* If the provided TCP_HANDLE is NULL, the foo_tcp_manager_destroy shall do nothing. */
+TEST_FUNCTION(foo_tcp_manager_destroy_does_nothing_on_null_handle)
+{
+    ///arrange
+
+    ///act
+    foo_tcp_manager_destroy(NULL);
+
+    ///assert
+
+    ///cleanup
+}
+
+/* The foo_tcp_manager_destroy shall free all resources allocated by the tcpip. */
+TEST_FUNCTION(foo_tcp_manager_destroy_succeed_on_free_all_resources)
+{
+    ///arrange
+    TCP_HANDLE handle = foo_tcp_manager_create();
+    umock_c_reset_all_calls();
+    STRICT_EXPECTED_CALL(netif_remove(IGNORED_PTR_ARG));
+    STRICT_EXPECTED_CALL(free(handle));
+
+    ///act
+    foo_tcp_manager_destroy(handle);
+
+    ///assert
+    ASSERT_ARE_EQUAL(char_ptr, umock_c_get_expected_calls(), umock_c_get_actual_calls());
+
+    ///cleanup
+}
+```
+
+If a single unit test tests more than one requirement, it should be sequentially enumerated in the unit test file, and the same number should be added to the test name in the code comment. For example:
+
+_*API source code file:*_
+```c
+    /*[foo_tcp_manager_create_createAndReturnInstanceSucceed_1]*/
+    TCP_INSTANCE* instance = (TCP_INSTANCE*)malloc(sizeof(TCP_INSTANCE));
+```
+
+_*Unit test file:*_
+```c
+/*[1]The foo_tcp_manager_create shall create a new instance of the TCP_INSTANCE 
+        and return it as TCP_HANDLE.*/
+/*[2]The foo_tcp_manager_create shall initialize the tcpip thread.*/
+/*[3]The foo_tcp_manager_create shall initialize the netif with default 
+        gateway, ip address, and net mask by calling netif_add.*/
+/*[4]The foo_tcp_manager_create shall set the netif defaults by calling 
+        netif_set_default and netif_set_up.*/
+/*[5]If dhcp is enabled, the foo_tcp_manager_create shall start it by calling dhcp_start.*/
+TEST_FUNCTION(foo_tcp_manager_create_createAndReturnInstanceSucceed)
+{
+    ...
+}
+```
+
+~MustNot
+have any memory leaks (always run samples under [valgrind](http://www.valgrind.org/downloads/current.html). Unit tests and e2e tests should be automatically valgrind verified at the gate).
+~
+
 ~ Must
 unit test your API with [ccputest](https://cpputest.github.io/), a unit testing and mocking framework for C and C++.
 ~
 
 ~ Must
-automatically run unit tests when building your client library.
+automatically run unit tests when building your client library; i.e. make unit tests part of your continuos integration (CI)
 ~
 
 ~ Must
 maintain a 80% code coverage with unit tests.
-
-~ ToDo
-is this even a reasonable ask for testing?
-~
 ~

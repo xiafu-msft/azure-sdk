@@ -4,9 +4,10 @@ We use a common build and test pipeline to provide for automatic distribution of
 
 ~ Must
 use [CMake](https://cmake.org/) v3.x for your project build system.
+~
+
 ~ ToDo
 there was a reason why CMake 3.x was chosen, and I think the specific version had a reason too - we should document that here.
-~
 ~
 
 ~ Must
@@ -37,13 +38,8 @@ Using `-i` does an in-place edit of the files for style.  Drop this argument if 
 ~ ToDo
 decide on exact formatting standards to use and include here.
 ~
-~
-
-~ Must
-use [doxygen](https://doxygen.nl) for reference documentation for HTML.
 
 ~ ToDo
 we should have a build target and example configuration file for doxygen that the client library developer can just include in their CMakeLists.txt files
-~
 ~
 

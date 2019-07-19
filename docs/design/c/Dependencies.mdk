@@ -36,8 +36,10 @@ others? (expat for xml parsing)?
 Note that libcurl and libuv should be wrapped into azure core so that we can just include azure core and be done.
 ~
 
+~
 We expect this list to expand over time.  Consult with [adparch] if you wish to use a new library that is not listed above.
 
 <!-- Links -->
 [libcurl]: https://curl.haxx.se/libcurl/
 [libuv]: http://libuv.org/
+~

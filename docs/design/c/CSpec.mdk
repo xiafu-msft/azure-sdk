@@ -21,7 +21,7 @@ css         : custom.css
 
 # Azure SDK design guidelines for the C language { -;  toc-line: '' }
 
-This document describes the architectural considerations and API design guidelines for the Azure SDK client libraries written in C.  The primary focus of these guidelines is to ensure that a client library developer can write code that targets the Azure supported IoT platforms.
+This document describes the architectural considerations and API design guidelines for the Azure SDK client libraries written in C.  The primary focus of these guidelines is to ensure that a client library developer can write code that targets the Azure supported IoT/embedded platforms, but should also be used for any other C API.
 
 [TOC]
 
