@@ -8,7 +8,7 @@ include docstrings compatible with the [doxygen](http://www.doxygen.nl/index.htm
 For example a (very) simple docstring might look like:
 ```
 /**
- *   @struct az_appconf_client_t
+ *   @struct az_appconf_client
  *   @brief The az_appconf_client represents the resources required for a connection to
  *          an Azure AppcConfiguration resource.
  */
