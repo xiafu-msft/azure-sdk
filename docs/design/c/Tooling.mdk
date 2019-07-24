@@ -3,7 +3,7 @@
 We use a common build and test pipeline to provide for automatic distribution of client libraries.  To support this, we need common tooling.
 
 ~ Must
-use [CMake](https://cmake.org/) v3.x for your project build system.
+use [CMake](https://CMake.org/) v3.x for your project build system.
 ~ ToDo
 there was a reason why CMake 3.x was chosen, and I think the specific version had a reason too - we should document that here.
 ~
@@ -26,13 +26,13 @@ should we be advising the use of valgrind, cppcheck, or other analysis tools (st
 ~
 
 ~ Must
-Default to hidden visibility when building dynamic libraries. For cmake:
-```cmake
+Default to hidden visibility when building dynamic libraries. For CMake:
+```CMake
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 ```
 
-Then, you can use an export macro to export symbols. For example
+Then, you can use an export macro to export symbols. For example:
 ```c
 #ifndef APPCONF_EXPORT_H
 #define APPCONF_EXPORT_H
@@ -78,13 +78,13 @@ Then, you can use an export macro to export symbols. For example
 ```
 
 CMake can automatically generate an appropriate export header:
-```cmake
+```CMake
 include(GenerateExportHeader)
 generate_export_header(appconf
     EXPORT_FILE_NAME az/appconf_export.h)
 ```
 
-This is better than writing the export header yourself because cmake knows what to do
+This is better than writing the export header yourself because CMake knows what to do
 for all platforms/compilers.
 ~
 
@@ -109,8 +109,8 @@ decide on exact formatting standards to use and include here.
 ~ Must
 use [doxygen](https://doxygen.nl) for reference documentation for HTML.
 
-For example in cmake:
-```cmake
+For example in CMake:
+```CMake
 find_package(Doxygen REQUIRED doxygen)
 set(DOXYGEN_GENERATE_HTML YES)
 set(DOXYGEN_GENERATE_XML YES)
