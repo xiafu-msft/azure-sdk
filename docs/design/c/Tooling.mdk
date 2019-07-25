@@ -96,10 +96,9 @@ clang-format -style=llvm -i <file> ...
 ```
 
 Using `-i` does an in-place edit of the files for style.  Drop this argument if you intend
- to adjust style manually. If using Visual Studio, there is 
- [an extension](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.llvm-toolchain) 
- that binds Ctrl-R Ctrl-F to this operation. Additionally Visual Studio 2019 
- includes this functionality by default.
+ to adjust style manually. There is 
+ [a Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.llvm-toolchain) 
+ that binds Ctrl-R Ctrl-F to this operation. Visual Studio 2019 includes this functionality by default.
 
 ~ ToDo
 decide on exact formatting standards to use and include here.
@@ -124,7 +123,6 @@ doxygen_add_docs(doxygen
 	${PROJECT_SOURCE_DIR}/src
 	${PROJECT_SOURCE_DIR}/doc
 	COMMENT "generate docs")
-
 ```
 ~
 
