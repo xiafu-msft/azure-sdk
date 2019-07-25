@@ -3,7 +3,7 @@
 We use a common build and test pipeline to provide for automatic distribution of client libraries.  To support this, we need common tooling.
 
 ~ Must
-use [CMake](https://cmake.org/) v3.x for your project build system.
+use [CMake](https://CMake.org/) v3.x for your project build system.
 ~
 
 ~ ToDo
@@ -18,12 +18,74 @@ include the following standard targets:
 * `docs` to generate reference documentation
 * `all` to run all three targets
 
-~
-
 Include other targets as they appear useful during the development process.
+~
 
 ~ ToDo
 should we be advising the use of valgrind, cppcheck, or other analysis tools (static or dynamic)?
+~
+
+~ Must
+Default to hidden visibility when building dynamic libraries. For CMake:
+```CMake
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+```
+
+Then, you can use an export macro to export symbols. For example:
+```c
+#ifndef APPCONF_EXPORT_H
+#define APPCONF_EXPORT_H
+
+#ifdef APPCONF_STATIC_DEFINE
+#  define APPCONF_EXPORT
+#  define APPCONF_NO_EXPORT
+#else
+#  ifndef APPCONF_EXPORT
+#    ifdef appconf_EXPORTS
+        /* We are building this library */
+#      define APPCONF_EXPORT __declspec(dllexport)
+#    else
+        /* We are using this library */
+#      define APPCONF_EXPORT __declspec(dllimport)
+#    endif
+#  endif
+
+#  ifndef APPCONF_NO_EXPORT
+#    define APPCONF_NO_EXPORT 
+#  endif
+#endif
+
+#ifndef APPCONF_DEPRECATED
+#  define APPCONF_DEPRECATED __declspec(deprecated)
+#endif
+
+#ifndef APPCONF_DEPRECATED_EXPORT
+#  define APPCONF_DEPRECATED_EXPORT APPCONF_EXPORT APPCONF_DEPRECATED
+#endif
+
+#ifndef APPCONF_DEPRECATED_NO_EXPORT
+#  define APPCONF_DEPRECATED_NO_EXPORT APPCONF_NO_EXPORT APPCONF_DEPRECATED
+#endif
+
+#if 0 /* DEFINE_NO_DEPRECATED */
+#  ifndef APPCONF_NO_DEPRECATED
+#    define APPCONF_NO_DEPRECATED
+#  endif
+#endif
+
+#endif /* APPCONF_EXPORT_H */
+```
+
+CMake can automatically generate an appropriate export header:
+```CMake
+include(GenerateExportHeader)
+generate_export_header(appconf
+    EXPORT_FILE_NAME az/appconf_export.h)
+```
+
+This is better than writing the export header yourself because CMake knows what to do
+for all platforms/compilers.
 ~
 
 ~ Must
@@ -33,13 +95,31 @@ use [clang-format](http://clang.llvm.org/docs/ClangFormat.html) for formatting, 
 clang-format -style=llvm -i <file> ...
 ```
 
-Using `-i` does an in-place edit of the files for style.  Drop this argument if you intend to adjust style manually.  If using Visual Studio, there is [an extension](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.llvm-toolchain) that binds Ctrl-R Ctrl-F to this operation.
+Using `-i` does an in-place edit of the files for style.  Drop this argument if you intend
+ to adjust style manually. There is 
+ [a Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.llvm-toolchain) 
+ that binds Ctrl-R Ctrl-F to this operation. Visual Studio 2019 includes this functionality by default.
+~
 
 ~ ToDo
 decide on exact formatting standards to use and include here.
 ~
 
-~ ToDo
-we should have a build target and example configuration file for doxygen that the client library developer can just include in their CMakeLists.txt files
+For example in CMake:
+```CMake
+find_package(Doxygen REQUIRED doxygen)
+set(DOXYGEN_GENERATE_HTML YES)
+set(DOXYGEN_GENERATE_XML YES)
+set(DOXYGEN_OPTIMIZE_OUTPUT_FOR_C YES)
+set(DOXYGEN_EXTRACT_PACKAGE YES)
+set(DOXYGEN_SIMPLE_STRUCTS YES)
+set(DOXYGEN_TYPEDEF_HIDES_STRUCT NO)
+
+doxygen_add_docs(doxygen
+	${PROJECT_SOURCE_DIR}/inc
+	${PROJECT_SOURCE_DIR}/src
+	${PROJECT_SOURCE_DIR}/doc
+	COMMENT "generate docs")
+```
 ~
 

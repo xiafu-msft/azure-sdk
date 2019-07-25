@@ -3,9 +3,169 @@
 # C language specifics
 
 ~ Must
-include docstrings compatible with the [doxygen](http://www.doxygen.nl/index.html) tool for generating reference Documentation
+include docstrings compatible with the [doxygen](http://www.doxygen.nl/index.html) tool for generating reference documentation
+
+For example a (very) simple docstring might look like:
+```
+/**
+ *   @struct az_appconf_client
+ *   @brief The az_appconf_client represents the resources required for a connection to
+ *          an Azure AppcConfiguration resource.
+ */
+```
 ~
 
 ~ Must
-ensure that each sample is executable when compiled by providing a `main()` function.
+Use doxygen's `@cmd` style docstrings
+~
+
+~ Must
+Format parameter documentation like the following:
+```
+/* <....documentation....>
+* \param[<direction>] <param_name> __<additional_annotations>__ description
+* <....documentation....>
+*/
+```
+
+`<additional_annotations>` is a space-separated list of the following annotations:
+
+* `[transfer none|full|container]`
+    : indicates who owns a parameter and how that ownership is transferred by a given function
+      each ownership transfer mode is defined below. The recipient of a value is the caller for `[callee allocates]` parameters and the callee for `[caller allocates]` parameters
+* `[transfer none]`
+    : indicates no change in ownership for this parameter. This is sometimes called "borrowing"
+* `[transfer full]`
+    : indicates complete ownership transfer. After a call to the function the recipient (either the caller or the callee) will be
+      responsible for the value. This usually means the recipient will at least need to arrange for any memory referred to by
+      the value to be freed.
+* `[transfer container]`
+    : indicates full ownership transfer for a container value, but not for its contents. For example a char** parameter (that referrers to an array of cstrings)
+      would be annotated as `[transfer container]` if the recipient is expected to free the array, but not free each element therein.
+* `[nullable]`
+    : the parameter may be set to NULL, only valid for pointer parameters/return values. Don't annotate return values or out parameters as `[nullable]`
+      if NULL is used to report errors. If a parameter is marked `[nullable]` document what happens when it is null.
+* `[not nullable]`
+    : The parameter may not be null.
+* `[caller allocates]`
+    : memory for the value is expected to be allocated by the caller. This is the default for `[in]` parameters, and `[out]/[in,out]` parameters
+      that have a single indirection (that is `Foo* p` is `[caller allocates]` but `Foo** p` is not).
+* `[callee allocates]`
+    : memory for the value will be allocated by the callee. This usually means the caller will need to free said memory when it's no longer needed.
+
+
+For example:
+```c++
+/**
+ * @brief execute a blocking get request
+ *	
+ * @memberof az_appconf_client
+ * 
+ * @param[in] client __[transfer none]__
+ * @param[in] path_and_query __[transfer none][not nullable]__ 
+ * 			  The query to execute relative to the base url of the client
+ * @param[out] result __[transfer full][not nullable][callee allocates]__
+ * @param[out] result_sz __[not nullable]__ size of the result
+ */
+az_appconf_err az_appconf_req_get(
+    az_appconf_client* client, const char* path_and_query, unsigned char** result, size_t* result_sz);
+```
+
+Here we see that the first two parameters are input parameters, with no ownership transfer (that is, they are a "borrow").
+The `result` output parameter is labeled as `[callee allocates]` because it allocates memory for the output parameter itself.
+Since `result` is owned by the caller after `az_appconf_req_get` returns it's annotated as `[transfer full]`.
+~
+
+~ May
+Assume the following default annotations:
+
+* `[not nullable]`
+* For `[caller allocates]` parameters: `[transfer none]`
+* For `[callee allocates]` parameters: `[transfer full]`
+* For `[out]` and `[in,out]` pointer parameters: `[caller allocates]`
+* For `[out]` and `[in,out]` pointer-to-pointer parameters: `[callee allocates]`
+* for `[in]` parameters: `[caller allocates]` (Note: `[callee allocates]` doesn't make sense for `[in]` parameters)
+~
+
+~ Must
+If you have nullable parameters document what happens when they are set to null.
+
+For example:
+```c
+/**
+ * @brief get properties of a cat (e.g. hair color, weight, floof)
+ *
+ * @param[in] our_cat __[transfer none]__ the cat to operate on
+ * @param[out] props __[nullable][caller-allocates]__ pointer to an array of num_props, or null
+ * @param[in,out] num_props __[non nullable][caller-allocates]__ pointer to the number of properties to
+ *                                                               retrieve or to a location to store the number of
+ *                                                               properties queried as described below
+ *
+ * If @p props is NULL then return the number of properties available in @p num_props,
+ * otherwise return @p num_props into the array at @p props
+ */
+az_error az_catherding_get_cat_properties(cat* our_cat, cat_properties* props, size_t* num_props);
+```
+
+This function returns an array using all caller-allocated memory. In order to figure out the size of the array
+the caller can pass NULL for the array `[out]` parameter. They can then allocate the required memory and call the function
+again.
+~
+
+~ Must
+For all parameters that are pointers, or structures/unions containing pointers, provide at least a `<direction>`.
+~
+
+~ Note
+These annotations are derived from [gobject-introspection-annotations](https://wiki.gnome.org/Projects/GObjectIntrospection/Annotations).
+It's not a big deal that we use that form, it's just critical that there is a standard way to indicate ownership of reference parameters
+~
+
+~ Must
+Provide a target named `doxygen` to build documentation.
+~
+
+Using CMake:
+
+```cmake
+find_package(Doxygen REQUIRED doxygen)
+set(DOXYGEN_GENERATE_HTML YES)
+set(DOXYGEN_GENERATE_XML YES)
+set(DOXYGEN_OPTIMIZE_OUTPUT_FOR_C YES)
+set(DOXYGEN_EXTRACT_PACKAGE YES)
+
+doxygen_add_docs(doxygen
+    ${PROJECT_SOURCE_DIR/src}
+    ${PROJECT_SOURCE_DIR/inc}
+    COMMENT "generate docs")
+```
+
+Notice that:
+* We use `find_package()` to find doxygen
+* We use the `DOXYGEN_<PREF>` CMake variables instead of writing your own doxyfile
+* We set `OPTIMIZE_OUTPUT_FOR_C` in order to get more C appropriate output.
+* We use `doxygen_add_docs` to add the target, this will generate a doxyfile for you.
+
+~ Must
+Ensure that each sample is executable when compiled by providing a `main()` function.
+~
+
+~ Must
+Provide a CMake option of the form `<SDK_NAME>_BUILD_EXAMPLES` that includes all examples in the build.
+
+For example if you keep examples in the `examples` directory you could use:
+
+```cmake
+if(AZURE_APPCONF_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+```
+~
+
+~ MustNot
+Install examples by default
+~
+
+~ Must
+Document how your function can fail, for example if returning an error code document when each possible code will be returned.
 ~
