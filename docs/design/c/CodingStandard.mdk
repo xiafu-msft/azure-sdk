@@ -19,6 +19,7 @@ use header file guards.
 
 #endif /* sys_socket_h */
 ```
+~
 
 ~ MustNot
 use coding paradigms from other languages, including C++.  While C++ is a superset of C, using C++ constructs and style will confuse readers.
