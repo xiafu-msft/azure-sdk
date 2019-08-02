@@ -93,7 +93,7 @@ unit test your API with [ccputest](https://cpputest.github.io/), a unit testing 
 ~
 
 ~ Must
-automatically run unit tests when building your client library; i.e. make unit tests part of your continuos integration (CI)
+automatically run unit tests when building your client library; i.e. make unit tests part of your continuous integration (CI)
 ~
 
 ~ Must
