@@ -19,32 +19,32 @@ A typical definition might look like:
 Header file:
 
 ```c
-#ifndef _KEYVAULT_CLIENT
-#define _KEYVAULT_CLIENT
+#ifndef KEYVAULT_CLIENT_H
+#define KEYVAULT_CLIENT_H
 
 typedef struct az_keyvault_client az_keyvault_client;
 typedef struct az_keyvault_client_credentials az_keyvault_client_credentials;
 typedef struct az_keyvault_http_handler_pipeline az_keyvault_http_handler_pipeline;
 
-/* factory function */
-az_keyvault_client* az_keyvault_create_client();
-void az_keyvault_close_client(az_keyvault_client* client);
+az_keyvault_client *az_keyvault_create_client();
+void az_keyvault_close_client(az_keyvault_client *client);
 
 
 /* C does not support overloading function names, so we use a different name */
-az_keyvault_client* az_keyvault_create_client_with_credentials(az_keyvault_client_credentials* credentials);
+az_keyvault_client *az_keyvault_create_client_with_credentials(az_keyvault_client_credentials *credentials);
 
 /* Other functions related to kevault client */
-int az_keyvault_client_backup_certificate_With_http_messages(char* vaultBaseUrl, char* certificateName, char** custom_headers);
+int az_keyvault_client_backup_certificate_With_http_messages(char *vault_base_url, char *certificate_name, char **custom_headers, int headers_count);
 
 /* client used to create other types */
-az_keyvault_http_handler_pipeline* az_keyvault_client_create_http_handler_pipeline(az_http_client_handler* handler);
-void az_keyvault_client_close_http_handler_pipeline(az_keyvault_http_handler_pipeline* handler_pipeline);
+az_keyvault_http_handler_pipeline *az_keyvault_client_create_http_handler_pipeline(az_http_client_handler *handler);
+void az_keyvault_client_close_http_handler_pipeline(az_keyvault_http_handler_pipeline *handler_pipeline);
 
-#endif
+#endif /* IOT_CLIENT_API_H */
 ```
 
 Source file:
+
 ```c
 #include <stdbool.h> 
 #include <stddef.h>
@@ -53,56 +53,60 @@ Source file:
 #include "keyvault_client.h"
 
 typedef struct az_keyvault_client {
-	char* accept_language;
-	char* api_version;
-	az_keyvault_client_credentials* credentials;
+	char *accept_language;
+	char *api_version;
+	az_keyvault_client_credentials *credentials;
 	bool generate_clientrequest_id;
 	int long_running_operation_retry_timeout;
-	char* vault_without_scheme;
+	char *vault_without_scheme;
 } az_keyvault_client;
 
 typedef struct az_keyvault_client_credentials {
-	char* version;
+	char *version;
 	/* remaining struct members here */
 } az_keyvault_client_credentials;
 
 typedef struct az_keyvault_http_handler_pipeline {
-	char* version;
+	char *version;
 	/* remaining struct members here */
 } az_keyvault_http_handler_pipeline;
 
-az_keyvault_client* az_keyvault_create_client() {
+az_keyvault_client *az_keyvault_create_client() {
 	/* implementation */
 	return NULL;
 }
 
-void az_keyvault_close_client(az_keyvault_client* client)
+void az_keyvault_close_client(az_keyvault_client *client)
 {
 	/* implementation */
 }
 
-az_keyvault_client* az_keyvault_create_client_with_credentials(az_keyvault_client_credentials* credentials) {
+az_keyvault_client *az_keyvault_create_client_with_credentials(az_keyvault_client_credentials *credentials) {
 	/* implementation */
 	return NULL;
 }
 
-int az_keyvault_client_backup_certificate_With_http_messages(char* vaultBaseUrl, char* certificateName, char** custom_headers)
+int az_keyvault_client_backup_certificate_With_http_messages(char *vault_base_url, char *certificate_name, char **custom_headers, int headers_count)
 {
 	/* implementation */
 	return 0;
 }
 
-az_keyvault_http_handler_pipeline* az_keyvault_client_create_http_handler_pipeline(az_http_client_handler* handler)
+az_keyvault_http_handler_pipeline* az_keyvault_client_create_http_handler_pipeline(az_http_client_handler *handler)
 {
 	/* implementation */
 	return NULL;
 }
 
-void az_keyvault_client_close_http_handler_pipeline(az_keyvault_http_handler_pipeline* handler_pipeline)
+void az_keyvault_client_close_http_handler_pipeline(az_keyvault_http_handler_pipeline *handler_pipeline)
 {
 	/* implementation */
 }
 ```
+
+~ ToDo
+Please note that in the previous examples, the memory model used is to have it allocated by the callee, rather than the caller. There are different options and this will be discussed further in a separate memory management section.
+~
 
 ~ Must {#clang-apisurface-serviceclientconstructor}
 allow the consumer to construct a service client with the minimal information needed to connect and authenticate to the service.
@@ -129,14 +133,21 @@ They cannot do this if the same operation is referred to by different verbs in d
 
 ~
 
-Examples:
+Some examples:
 ```c
+void az_keyvault_client_delete_key(az_keyvault_client *client, char *vault_base_url, char *key_name);
+void az_keyvault_client_delete_key_async(az_keyvault_client *client, char *vault_base_url, char *key_name, az_keyvault_callback *callback, void *callback_context);
+
+az_keyvault_certificate_bundle *az_keyvault_client_get_certificate(az_keyvault_client *client, char *certtificate_id);
+void az_keyvault_client_get_certificate_async(az_keyvault_client *client, char *certtificate_id, az_keyvault_callback *callback, void *callback_context);
+
+bool az_keyvault_client_exists_key(az_keyvault_client *client, char *key_name);
 ```
 
 ~ Must {#clang-apisurface-lro-initiation}
 prefer the use of the following terms for long running operations:
 
-`    az_<shortname>_begin_<verb>_<noun>` for methods that initiate a long running operation.  Example `az_storage_begin_copy_from_url()`.
+`    az_<shortname>_<objname>_begin_<verb>_<noun>` for methods that initiate a long running operation.  Example `az_storage_blob_begin_copy_from_url()`.
 ~
 
 ~ Must {#clang-apisurface-supportallfeatures}

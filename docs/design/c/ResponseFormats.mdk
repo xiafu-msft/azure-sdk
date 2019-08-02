@@ -15,25 +15,25 @@ optimize for returning the logical entity for a given request. The logical entit
 For example, you may choose to do something similar to the following:
 
 ```c
-typedef struct _short_item {
+typedef struct az_json_short_item {
     // JSON decoded structure.
-} SHORT_ITEM;
+} az_json_short_item;
 
-typedef struct _short_paged_results {
+typedef struct az_json_short_paged_results {
     uint32 size;
-    SHORT_ITEM *items;
-} *SHORT_PAGED_RESULTS;
+    az_json_short_item *items;
+} az_json_short_paged_results;
 
 
-struct _short_raw_paged_results {
+typedef struct az_json_short_raw_paged_results {
     HTTP_HEADERS *headers;
     uint16 status_code;
     byte *raw_body;
-    SHORT_PAGED_RESULTS results;
-} *SHORT_RAW_PAGED_RESULTS;
+    az_json_short_paged_results* results;
+} az_json_short_raw_paged_results;
 
-SHORT_PAGED_RESULTS short_list_items(client, /* extra params */);
-SHORT_RAW_PAGED_RESULTS short_list_items_with_response(client, /* extra params */);
+az_json_short_paged_results* az_json_get_short_list_items(client, /* extra params */);
+az_json_short_raw_paged_results* az_json_get_short_list_items_with_response(client, /* extra params */);
 ```
 
 ~ Must {#general-return-document-raw-stream}

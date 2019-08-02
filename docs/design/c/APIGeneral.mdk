@@ -18,4 +18,79 @@ The authentication policies are generally within the Azure Core library - that d
 
 ### Memory Management {#clang-memory-management}
 
-When using C, memory management
+~ ToDo
+What style of memory management do we want to use? Options include:
+
+* The callee allocates the memory and returns it; e.g. `az_iot_client *az_iot_create_client();` <br/> Also, memory allocated by an SDK API will require the client to call another function to dispose allocated memory; e.g. `void az_iot_close_client(az_iot_client *client);`
+
+* The caller allocates the memory and passes it to the functions; e.g. `int az_iot_create_client(az_iot_client* client);`. 
+The API caller could then write code similar to:
+
+```c
+az_iot_client client; /* or allocate dynamically with malloc() if needed */
+
+/* init client, if needed */
+client.id = 0; 
+client.name = NULL;
+
+if (az_iot_create_client(*client) != 0)
+{
+    /* handle error */
+}
+```
+
+* Another option might be to pass functions to allocate/deallocate memory as needed. This is similar to the threadx style; e.g.
+
+```c
+/* In this example, both allo and free are used in the same struct, but it's possible to use only one */
+typedef struct az_alloc_callbacks {
+    void* (*allocate)(size_t);
+    void (*free)(void*);
+} az_alloc_callbacks;
+
+az_iot_client *az_iot_create_client(az_alloc_callbacks *allocation_callbacks);
+void az_iot_close_client(az_iot_client *client, az_alloc_callbacks *allocation_callbacks);
+
+/* client code */
+int test() {
+    az_iot_client *client = az_iot_create_client(&(az_alloc_callbacks){.allocate = malloc, .free = 0});
+    return client != NULL;
+};
+```
+
+* A different way to achieve the previous, but on a global rather than local scale is to enable the customer to provide a global function to allocate and free memory.
+This example is from [Azure ulib-c guidelines](https://github.com/Azure/azure-ulib-c/blob/aff6c7769c6204f6160f4634e30c4fe9b8978db4/doc/code_style.md):
+
+```c
+/**
+ * @brief   uLib malloc
+ *
+ *  Defines the malloc function that the ulib shall use as its own way to dynamically allocate
+ *      memory from the HEAP. For simplicity, it can be defined as the malloc(size) from the `stdlib.h`.
+ */
+#define AZIOT_ULIB_CONFIG_MALLOC(size)    malloc(size)
+
+/**
+ * @brief   uLib free
+ *
+ *  Defines the free function that the ulib shall use as its own way to release memory dynamic 
+ *      allocated in the HEAP. For simplicity, it can be defined as the free(ptr) from the `stdlib.h`.
+ */
+#define AZIOT_ULIB_CONFIG_FREE(ptr)       free(ptr)
+```
+
+* Finally, another example from the [Azure ulib-c guidelines](https://github.com/Azure/azure-ulib-c/blob/aff6c7769c6204f6160f4634e30c4fe9b8978db4/doc/code_style.md) as well.<br/>
+_To avoid multiple copies of the same content, functions that receive a buffer may require a pointer to a release function. 
+The object that receives the buffer may keep it for the time frame that is needed, when it is not necessary anymore, it shall call the release function.
+The release function should came after the buffer in the list of arguments, and the name should be `release_` following you the buffer name. For example:_
+
+```c
+AZIOT_RESULT aziot_client_send_async(AZIOT_CLIENT* client, 
+        AZIOT_MESSAGE* message, AZIOT_RELEASE_CALLBACK release_message, 
+        AZIOT_CLIENT_RESULT_CALLBACK callback, AZIOT_CLIENT_RESULT_CONTEXT context);
+
+/* The signature of the release function should be */
+
+void release(void *ptr);
+```
+~

@@ -1,6 +1,118 @@
-# C coding standards
+Madoko documentation: http://madoko.org/reference.html
 
-The following coding standards have been adopted to ensure consistency and readability across all client libraries.
+Title       : Coding standards for Azure C SDK
+Title Note  : Version 1.0.0
+Logo        : False
+Embed       : False
+css         : custom.css
+
+[INCLUDE=../components.mdk]
+
+[TITLE]
+
+# Coding standards
+
+The following C Programming Language coding standards have been adopted to ensure consistency and readability across all client libraries.
+Some of this has been adapted from [C Coding Standard](http://www.cs.utah.edu/~tch/snets/SNETCCodingStandard.html).
+
+## Naming standard
+### Namespaces {#clang-namespaces}
+
+C programming language does not have the concept of a namespace, similar to other programming languages, such as C++. However, we could achieve a similar behaviour by having external facing function and variable names follow this naming pattern
+`az_<shortname>_<objname>_<functionname>()` where _shortname_ is the service name for the API represented as a single word and _objtname_ denotes a logical grouping of actions within the same area.<br/>Some examples:
+
+```c
+az_keyvault_key* az_keyvault_keyclient_create_key(char* info)
+{
+
+}
+```
+
+```c
+az_eventhub_eph_process_partition(az_eventhub_partition_info* partition_info)
+{
+
+}
+
+void az_iot_credential_init(az_iot_credential* credential)
+{
+    
+}
+
+void az_iot_credential_deinit(az_iot_credential* credential)
+{
+
+}
+
+```
+
+Please note, the function names in the examples are separated using underbars ('_') to follow the common naming convention recommended in the guidelines.
+
+~ Must
+prepend all exposed functions with `az` followed by '\_' and short name for the client library, followed by '\_' and object name (with appropriate casing for the situation).
+~
+
+~ Must
+register the short name used by the client library with [adparch](https://github.com/Azure/azure-sdk-pr/issues/new/choose).
+~
+
+## Directory tree organization
+The repo should follow the structure:
+
+```
+repo_name
+    build_all
+    config
+        repo_name_config.h
+    deps
+        dep_1
+        dep_2
+        dep_n
+    inc
+        internal
+    pal
+    sample
+        sample_1
+        sample_2
+        sample_n
+    tests
+        inc
+        src
+        lib_1_ut
+        lib_2_ut
+        lib_n_ut
+        test_a_e2e
+        test_b_e2e
+        test_c_lh
+        test_d_lh
+    src
+        lib_1
+        lib_2
+        lib_n
+    LICENSE
+    README.md
+```
+
+Where:
+
+* **build_all**: Contains the scripts to build the project.
+
+* **config**: Contains the user configuration, it contains a default config that the user should copy and modify to create its own set of configurations.
+
+* **deps**: Contains the repo dependencies, normally github submodules.
+
+* **inc**: Contains the includes of the repo, all files on the root are the public API and should be part of the LTS (Long Term Support). The files in the `internal` are the ones that contains the signature of methods and data structs that are not part of 
+the public API and Microsoft can change it without any previous note. The `internal` should not be part of the include path, include an internal file should always contains the internal path in the name, (ex: `#include “internal/bar_non_public.h”`).
+
+* **pal**: Contains the files with the port specific code.
+
+* **sample**: Contains samples and tutorials that users will use as reference to learn how to use the code in the repo.
+
+* **tests**: Contains the files with the tests for the libs (target code in the repo), each lib must have **ut** (unit test), it is very recommend to add **e2e** (end to end test), and **lh** (longhaul test) as well.
+
+* **LICENSE**: Is the file that describe the license of the code in the repo.
+
+* **README.md**: Is the file with the generic description of the repo, it can contain links for the lib documentation
 
 ## Files
 
@@ -12,43 +124,74 @@ use standard extensions for files.  Use the `.h` extension for header files and 
 use header file guards.
 
 ```c
-#ifndef sys_socket_h
-#define sys_socket_h
+#ifndef IOT_CLIENT_H
+#define IOT_CLIENT_H
 
-/* Contents of sys/socket.h */
+/* Contents of iot_client.h */
 
-#endif /* sys_socket_h */
+#endif /* IOT_CLIENT_H */
 ```
 ~
 
-~ MustNot
-use coding paradigms from other languages, including C++.  While C++ is a superset of C, using C++ constructs and style will confuse readers.
-~
-
-## Names
+### File names
 
 ~ Must
-make names fit.
+follow these guidelines when naming files:
 
-Names are the heart of programming. In the past people believed knowing someone's true name gave them magical power over that person. If you can think up the true name for something, you give yourself and the people coming after power over the code. A name is the result of a long deep thought process about the ecology it lives in. Only a programmer who understands the system as a whole can create a name that "fits" with the system. If the name is appropriate everything fits together naturally, relationships are clear, meaning is derivable, and reasoning from common human expectations works as expected.
+* All file names should be full lowercase to avoid casing issues across platforms.
 
-If you find all your names could be Thing and DoIt then you should probably revisit your design.
+* A source (`.c`) filename should be made of the shortname, followed by the objectname. 
+  *Example*: `iot_credential.c`
+
+* Words in file names should be separated by `_`. 
+
+* The public API should be clearly identified with the shortname followed by the object name and the name `api` 
+ * *Example*: `iot_credential_api.h`
+
+* An include (`.h`) that is not part of the public API should be placed in the `internal` directory, and shall not contains the shortname on the name. The path `internal` should not be included as standard include directory.
+ * *Example*: `internal/credential.h`
+
+* The file name should use characters `a` to `z`, `0` to `9`, `_` (underscore) as name separator, and one `.` before the file extension. All other characters are not allowed. 
+
+* Filenames should be concise enough, but they should convey the information of what the file contains. 
+
+ **Bad**: `ih.c`, `the_iot_hub_client_thingie.c` 
+
+ **Good**: `iot_memorymanager_byte_malloc.c`
+~
+
+### Copyright
+All files should start with the copyright information:
+
+```c
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+```
+
+## General naming conventions
+
+~ Must
+use clear and concise names.
+~
+
+~ShouldNot
+use abbreviations unless necessary or when they are commonly used; e.g. `az_iot` can be used because `az` is a common abbreviation for Azure and `iot` is common enough.
+~
+
+~ Must
+use lower-case for all variable and function names.
 ~
 
 ~ Must
 use underbars ('_') to separate name components (snake-casing).
 ~
 
-~ Should
-use lower-case for all variable names that would be pushed onto the stack.  This assists with the identification of scope of the variable.
+~ Must
+use a single leading underscore to indicate that a name is not part of the public API and is not guaranteed to be stable.
 ~
 
 ~ Must
-use a single leading underscoe to indicate that a name is not part of the public API and is not guaranteed to be stable.
-~
-
-~ Must
-place the `*` as close to the variable name to indicate a pointer type.  i.e. use `char *name = NULL;`, not `char* name = NULL;`.
+place the `*` next to the variable name to indicate a pointer type.  i.e. use `char *name = NULL;`, not `char* name = NULL;`.
 ~
 
 ~ Must 
@@ -91,19 +234,21 @@ Each variable get its own type and line, although an exception can be made when 
 ~
 
 ~ Must
-declare major structures at the top of the file in which they are used, or in separate header files if they are used in multiple source files.  Use of the structures should be by separate declarations should be "extern" if they are declared within a header file.
+declare major structures at the top of the file in which they are used, or in separate header files if they are used in multiple source files.  
+Use of the structures should be by separate declarations should be "extern" if they are declared within a header file.
 ~
 
 ~ ToDo
 Should we use a meaningful prefix for each member name or for structures in general?
 ~
 
-~ MustNot
-use global variables.  Global variables should be avoided whenever possible.  If required, prepend global variables with `g_`.
+~ ShouldNot
+use global variables.  Global variables should be avoided whenever possible.  If absolutely necessary, declare them at the top of your files and prepend global variables with `g_`.
 ~
 
 ~ Must
-name global constants using upper-case and snake-casing.  For example, `const in A_GLOBAL_CONSTANT = 5;`.
+name global constants using upper-case and snake-casing.  For example, `const int GLOBAL_CONSTANT = 5;`.
+~
 
 ~ Must
 name enum types using pascal-casing.  The values within an enum must be upper-case and snake-cased.  There must not be a comma on the last element.  
@@ -128,13 +273,152 @@ make a label for an error state and make it the first label.  It is often useful
 For example:
 
 ```c
-enum ServiceState { 
+enum service_state { 
     STATE_ERR, 
     STATE_OPEN, 
     STATE_RUNNING, 
     STATE_DYING 
 };
 ```
+~
+
+## Functions
+
+~ Must
+use full lowercase name for the functions. The words should be separated by `_`. 
+```c
+int64_t bar_add(int32_t a, int32_t b);
+```
+~
+
+~ Must 
+have functions in the public API start with the shortname followed by the objectname name and the function name. The definition of the function should be placed in the *xx_api.h* file of the module (for the below example, the *az_iot_barclass_api.h*). 
+```c
+az_iot_result az_iot_barclass_init(az_iot_result *my_barclass, 
+        const char* const name, uint32_t entry, void* buffer_start, 
+        size_t buffer_size, uint8_t priority);
+```
+A public API that should be implemented in multiple flavors, should have the flavors with the same name of the public API preceded by `_`. For the flavor without argument validation, the name should be the same of the public API followed by `_no_test`. For example, the two flavors of `az_iot_credential_create_from_connection_string` should be: 
+```c
+/**
+ * @brief   Create a credential component from connection string.
+ */
+static inline az_iot_ulib_result az_iot_credential_create_from_connection_string(
+    az_iot_credential *credential,
+    const char* const connection_string)
+{
+#if AZIOT_CREDENTIAL_VALIDATE_ARGUMENTS
+    return _az_iot_credential_create_from_connection_string(
+        credential,
+        connection_string);
+#else
+    return _az_iot_credential_create_from_connection_string_no_test(
+        credential,
+        connection_string);
+#endif /* AZIOT_CREDENTIAL_VALIDATE_ARGUMENTS */
+}
+```
+~
+
+~ Should
+set as `static` all functions whose purpose is only inside of the source code (`.c`) . The static function should contain only the function name, without any prefix. For example:
+```c
+static int64_t sum(int32_t a, int32_t b)
+{
+    return (int64_t)a + (int64_t)b;
+}
+```
+~
+
+## Variables
+~ Must
+use full lowercase names for variables separated by `_`.
+Global variables should start with `g_` followed by the namespace, and the variable name. **Global variables should be strongly avoided**. 
+```c
+uint32_t g_aziot_byte_counter;
+```
+~
+
+~ Must
+start variables that are not `static` but not part of the public API should start with `_` followed by the shortname, the objectname, and the variable name.
+The definition of the variable should be placed in the header file of the module, inside of the `internal` directory. **These variable should be strongly avoided**. 
+
+```c
+uint32_t _az_iot_bar_byte_counter;
+```
+~
+
+~ Should 
+set as `static` variables whose propose is only inside of the source code (`.c`) . The static variable should not have any prefix, only the variable name.
+```c
+static uint32_t byte_counter = 10;
+```
+~
+
+~ Must 
+use a fully lowercase name separated by `_`, without any prefix, for arguments and local variable names; e.g. 
+
+```c
+static az_iot_bar_result call_procedure(
+    const char* const name, 
+    const void* const procedure_model_in, 
+    const void* procedure_model_out);
+{
+    uint32_t byte_counter = 10;
+    ...
+}
+```
+~
+
+## Structures
+Structures should be defined with typedef, the structure name should be lowercase with `_` separator. They should follow the same naming conventions and variables and functions; i.e. should start with `az_shortname_objectname'. 
+Only declarations should be part of the header files. A typical definition might look like:
+
+
+```c
+/* Header file: iot_client_api.h */
+
+#ifndef IOT_CLIENT_API_H
+#define IOT_CLIENT_API_H
+
+typedef struct az_iot_client az_iot_client;
+typedef struct az_iot_client_credentials az_iot_client_credentials;
+
+/* Rest of the declarations */
+
+#endif /* IOT_CLIENT_API_H */
+
+/* Source file: iot_client_api.c */
+
+#include "iot_client_api.h"
+
+typedef struct az_iot_client {
+	char *api_version;
+	az_iot_client_credentials *credentials;
+	int long_running_operation_retry_timeout;
+} az_iot_client;
+
+typedef struct az_iot_client_credentials {
+	char *version;
+	/* remaining struct members here */
+} az_iot_client_credentials;
+
+```
+
+## Callbacks
+Functions that request a callback with a context should ordering the callback first and than the callback context. For example:
+```c
+az_iot_client az_iot_client_send_async(az_iot_client *client, 
+        az_iot_message *message, az_iot_release_callback release_message, 
+        az_iot_client_result_callback callback, az_iot_client_result_context context)
+```
+
+All callbacks that has context should receive the context as the first argument. For example:
+```c
+static void on_client_result(az_iot_client_result_context context, 
+        az_iot_result result, az_iot_message_received message)
+```
+
 
 ## Macros
 
@@ -151,7 +435,7 @@ Examples:
 ```
 ~
 
-~ Must
+~ Should
 wrap a macro in `do { .... } while (0)` if the macro is more than a single statement, so that a trailing semicolon works.  Right-justify backslashes to ensure the macro is easier to read.
 
 Example:
@@ -195,19 +479,16 @@ make macro names unique.  Like global variables, macros can conflict with macros
 
 ## Formatting
 
+
 ~ Must
-place the starting brace on the same line as the conditional or looping statement.  For example:
+use [clang-format](http://clang.llvm.org/docs/ClangFormat.html) for formatting, using the following command-line options:
 
-```c
-if (condition) {
-    ...
-}
-
-while (condition) {
-    ...
-}
+```bash
+clang-format -style=llvm -i <file> ...
 ```
 ~
+
+In general, clang-format will format your code correctly and ensure consistency. However, these are few additional  rules to keep in mind.
 
 ~ Must
 place all conditional or loop statements on one line, or add braces to identify the conditional/looping block.
@@ -226,9 +507,24 @@ while (1) {
     } /* not valid */
 } /* end forever */
 ```
+~
+
+~ Must
+add comments to closing preprocessor to make it easier to understand it, example:.
+
+```c
+#if _BEGIN_CODE_
+
+#ifndef _INTERNAL_CODE_
+
+#endif /* _INTERNAL_CODE_ */
+
+#endif /* _BEGIN_CODE_ */
+```
+~
 
 ~ Should
-consider screen size limits.  Most people like blocks to fit within a common screen size so scrolling is not necessary when reading code.  Lines should not exceed 78 characters, and blocks should not exceed 25 lines.
+consider screen size limits.  Most people like blocks to fit within a common screen size so scrolling is not necessary when reading code.  Lines should not exceed 120 characters, and blocks should not exceed 40 lines.
 ~
 
 ~ MustNot
@@ -239,7 +535,7 @@ put parens next to keywords.  Put a space between the keyword and the paren.
 put parens next to function names.
 ~
 
-~ MustNot
+~ ShouldNot
 use parens in return statements when it isn't necessary.
 ~
 
@@ -256,6 +552,7 @@ else {
 
 } /* not valid */
 ```
+~
 
 ~ Must
 place the constant on the left hand side of an eqality/inequality comparison (yoda style).  For example, `if (6 == errNum) ...`.
@@ -314,11 +611,11 @@ place only one statement on each line.
 ## Complexity Management
 
 ~ Must
-initialize all variables.  Use of compiler flags (such as `gcc -W`) may catch operations on uninitialized variables.
+initialize all variables. Use of compiler flags (such as `gcc -Wall` or `cl.exe /W4`) may catch operations on uninitialized variables.
 ~
 
 ~ Must
-limit function bodies to one page of code (25 lines, approximately).
+limit function bodies to one page of code (40 lines, approximately).
 ~
 
 ~ Must
@@ -375,14 +672,14 @@ rely on automatic beautifiers. The main person who benefits from good program st
 use implicit assignment inside a test.  This is generally an accidental omission of the second `=` of the logical compare. The following is confusing and prone to error.
     
 ```c
-if (abool = bbool) { ... }
+if (a = b) { ... }
 ```
 
 Does the programmer really mean assignment here? Often yes, but usually no. The solution is to just not do it, an inverse Nike philosophy. Instead use explicit tests and avoid assignment with an implicit test. The recommended form is to do the assignment before doing the test:
 
 ```c
-abool = bbool;
-if (abool) { ... } 
+a = b;
+if (a) { ... } 
 ```
 ~
 
@@ -424,6 +721,7 @@ If you really need to test whether a symbol is defined or not, test it with the 
  #define USER_NAME "john smith"
 #endif
 ```
+~
 
 ~ Must
 Use `#if` to comment out large code blocks.

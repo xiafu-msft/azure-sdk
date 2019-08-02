@@ -45,7 +45,6 @@ This document describes the architectural considerations and API design guidelin
 
 The API surface of your client library must have the most thought as it is the primary interaction that the consumer has with your service.  
 
-[INCLUDE=./Namespace.mdk]
 [INCLUDE=./APIShape.mdk]
 [INCLUDE=./ResponseFormats.mdk]
 [INCLUDE=./Pagination.mdk]
