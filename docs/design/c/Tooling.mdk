@@ -3,11 +3,10 @@
 We use a common build and test pipeline to provide for automatic distribution of client libraries.  To support this, we need common tooling.
 
 ~ Must
-use [CMake](https://CMake.org/) v3.x for your project build system.
-~
+use [CMake](https://CMake.org/) v3.7 for your project build system. 
 
-~ ToDo
-there was a reason why CMake 3.x was chosen, and I think the specific version had a reason too - we should document that here.
+Version 3.7 is the minimum version installed on the azure pipelines microsoft hosted agents 
+(https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops)
 ~
 
 ~ Must
@@ -103,7 +102,6 @@ Using `-i` does an in-place edit of the files for style.  Drop this argument if 
 
 ~ ToDo
 decide on exact formatting standards to use and include here.
-~
 
 For example in CMake:
 ```CMake
@@ -123,3 +121,18 @@ doxygen_add_docs(doxygen
 ```
 ~
 
+~ Must
+Provide a CMake option of the form `<SDK_NAME>_BUILD_EXAMPLES` that includes all examples in the build.
+
+For example if you keep examples in the `examples` directory you could use:
+
+```cmake
+if(AZURE_APPCONF_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+```
+~
+
+~ MustNot
+Install examples by default.
+~
