@@ -26,9 +26,55 @@ We distinguish between several different types of errors:
 Check for the error with an assert, or similar
 ~
 
-~ MustNot
-Report the error to the caller. The calling code doesn't need to know, the human writing the system needs to know
+~ Should
+Provide a user-settable callback function to be invoked upon a failed, checked precondition.
+
+For example if you're implementing a client for the Azure Catherding API you might define:
+
+```c
+void az_catherding_default_panic_callback(void) {
+  abort();
+}
+static thread_local void(*az_catherding_panic_callback)(void) = &az_catherding_default_panic_callback;
+void az_catherding_set_panic_callback(void(*panic_callback)(void)) {
+  az_catherding_panic_callback = panic_callback;
+}
+
+void az_catherding_panic() {
+  az_catherding_panic_callback();
+}
+```
+
+Note that it's important that the callback be thread local, since in some situations you *can* kill the thread and continue execution.
 ~
+
+~ Must
+By default, any failures in checked preconditions should trigger a program crash, with as much debugging information as feasible
+~
+
+~ May
+Provide an option to disable any checks, and omit the code to preform them from built libraries/executables.
+~
+
+### Post Conditions
+
+~ ShouldNot
+Check preconditions in a way that changes the computational complexity of the function.
+~
+
+~ Must
+Provide a way to omit post condition checks from the built library/executable.
+~
+
+### Exhaustion / Act of God
+
+The most common error in this class will be "out of memory" errors, where you try and allocate
+a small object, of statically known size, and the system can not fulfill that request. On some platforms
+(mainly those that overcommit), it's extremely hard to handle this gracefully. Additionally if you are "almost"
+out of memory and attempt to grow the stack (by calling functions, for example) then the system _WILL NOT TELL YOU_
+and your program's state will be corrupted. Thus 
+
+
 
 ~ Must
 Provide an error code for each error that the client library can produce.  Provide a list of constants to allow easy identification of error conditions.
