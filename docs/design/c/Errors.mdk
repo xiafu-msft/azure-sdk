@@ -68,11 +68,32 @@ Provide a way to omit post condition checks from the built library/executable.
 
 ### Exhaustion / Act of God
 
-The most common error in this class will be "out of memory" errors, where you try and allocate
-a small object, of statically known size, and the system can not fulfill that request. On some platforms
-(mainly those that overcommit), it's extremely hard to handle this gracefully. Additionally if you are "almost"
-out of memory and attempt to grow the stack (by calling functions, for example) then the system _WILL NOT TELL YOU_
-and your program's state will be corrupted. Thus 
+~ MustNot
+Attempt to return an error to the caller
+~
+
+~ May
+Attempt to crash, if possible
+~
+
+### Recoverable Error
+
+Functions that may encounter a recoverable error should report it by way of 
+
+### A Note on Out Of Memory
+
+We all want to be able to handle low memory situations gracefully and effectively, and C is "helpful" in that
+most memory allocation functions will return an error or nullpointer if they fail, including in the case of
+"out of memory". If you need to allocate memory of a dynamic (user specified) size, or of an extremely large size, then
+failures of that allocation should always be treated as a recoverable error. However for small, compile-time
+constant sized allocations the decision of weather to treat a failure as an "Act of God" or a "Recoverable error" is more subtle
+and should be decided when you start a new library (with ARB consultation).
+
+On some platforms (mainly those that overcommit), it's extremely hard to handle OOM gracefully. Additionally if you are "almost"
+out of memory and attempt to grow the stack (by calling functions, for example) then the system _MAY NOT TELL YOU_
+and your program's state will be corrupted. Thus in order to be able to recover from out of memory errors the program needs to have bounded
+stack size, and set the stacksize to the maximum value at the start of the program (because otherwise the stack could try and grow when you don't have any more memory). Additionally the library needs to never allocate anything on the OOM error handling path, and it probably needs to
+have special code to try and free memory. 
 
 
 
