@@ -6,20 +6,23 @@ to be used on a wide range of devices with a wide range of reliability requireme
 We distinguish between several different types of errors:
 
 * Pre-Conditions
-    : Pre-Condition errors occur when a caller violates the expectations of a function, for example by passing an out-of-range value or a null pointer. These are always
+    : Pre-Condition errors occur when a caller violates the expectations of a function, 
+      for example by passing an out-of-range value or a null pointer. These are always
       avoidable by the direct caller, and will always require a source code change (by the caller) to fix.
 * Post-Conditions
-    : Post-Condition violations happen when some function didn't do the correct thing, these are _always_ bugs in the function itself, and users shouldn't be
+    : Post-Condition violations happen when some function didn't do the correct thing, 
+      these are _always_ bugs in the function itself, and users shouldn't be
       expected to handle them.
 * Exhaustion / Act of God
-    : errors like running out of stack space, or dealing with power failure that, in general, can not be anticipated and after which it may be hard to execute any more code,
-      let alone recover. Code handling these errors needs to be written to *very* specific requirements, for example not doing any allocations and never growing the stack. Or attempting
-      to do a fast shutdown on UPS power.
+    : errors like running out of stack space, or dealing with power failure that, 
+      in general, can not be anticipated and after which it may be hard to execute any more code,
+      let alone recover. Code handling these errors needs to be written to *very* specific requirements, for example not doing any allocations and never growing the stack. Or attempting to do a fast shutdown on UPS power.
 * Recoverable Error
-    : Things like trying to open a file that doesn't exist, or trying to write to a full disk. These kinds of errors can usually be handled by a function's caller directly, 
+    : Things like trying to open a file that doesn't exist, 
+      or trying to write to a full disk. These kinds of errors can usually be handled by a function's caller directly, 
       and need to be considered by callers that want to be robust.
 
-      
+
 #### Pre Conditions
 
 ~ May
@@ -27,7 +30,7 @@ Check for the error with an assert, or similar
 ~
 
 ~ Should
-Provide a user-settable callback function to be invoked upon a failed, checked precondition.
+Provide a user-settable callback function to be invoked upon the failure of a check precondition.
 
 For example if you're implementing a client for the Azure Catherding API you might define:
 
@@ -56,17 +59,26 @@ By default, any failures in checked preconditions should trigger a program crash
 Provide an option to disable any checks, and omit the code to preform them from built libraries/executables.
 ~
 
-### Post Conditions
+~ Must
+Document all function preconditions. For conditions like "not null" a `[not nullable]` annotation is enough.
+~
+
+#### Post Conditions
 
 ~ ShouldNot
-Check preconditions in a way that changes the computational complexity of the function.
+Check post-conditions in a way that changes the computational complexity of the function.
+~
+
+~ ToDo
+should we tell people to use some builtin facility for this, I'd lean toward just having like
+`az_ensure(bool, char*)` functions / macros. Or using assert.
 ~
 
 ~ Must
-Provide a way to omit post condition checks from the built library/executable.
+Provide a way to disable post condition checks, and omit them from the built library/executable.
 ~
 
-### Exhaustion / Act of God
+#### Exhaustion / Act of God
 
 ~ MustNot
 Attempt to return an error to the caller
@@ -76,11 +88,53 @@ Attempt to return an error to the caller
 Attempt to crash, if possible
 ~
 
-### Recoverable Error
+#### Recoverable Error
+~ Must
+Report recoverable errors by way of an additional output parameter named `err`. For example:
+```c
+int az_catherding_count_cats(az_catherding_herd* herd, az_error* err) {
+  if(herd->has_shy_cats) {
+    az_error_set(err, AZ_CATHERDING_DOMAIN, AZ_CATHERDING_ERROR_HIDING_CATS);
+    return 0;
+  }
+  return herd->num_cats;
+}
+```
 
-Functions that may encounter a recoverable error should report it by way of 
+The function `az_error_set` will set the "domain" and error code of err, it is a precondition violation if err already contains
+an error. If err is NULL then az_error_set will call `az_panic`.
 
-### A Note on Out Of Memory
+A calling function from within the `az_catherding` library might look like:
+```c
+int az_catherding_has_cats(az_catherding_herd* herd, az_error* err) {
+  return az_catherding_count_cats(herd, err) > 0;
+}
+```
+
+notice that by passing it's own `err` parameter through to `az_catherding_count_cats`, `az_catherding_has_cats` is able to
+easily propagate errors back to it's own caller.
+
+A user calling such a function might look like:
+```c
+az_error err = {0};
+int cats = az_catherding_count_cats(herd, &err);
+if(az_error_is_failure(&err)) {
+  // handle the error
+}
+// do stuff with cats
+```
+~
+
+~ Must
+produce a recoverable error when any HTTP request fails with an HTTP status code that is not defined by the service/Swagger as a successful status code.
+~
+
+~ Must
+Document all recoverable errors each function can gernerate directly. You don't need to document errors that you are simply propagating back to
+the caller.
+~
+
+#### A Note on Out Of Memory
 
 We all want to be able to handle low memory situations gracefully and effectively, and C is "helpful" in that
 most memory allocation functions will return an error or nullpointer if they fail, including in the case of
@@ -92,31 +146,6 @@ and should be decided when you start a new library (with ARB consultation).
 On some platforms (mainly those that overcommit), it's extremely hard to handle OOM gracefully. Additionally if you are "almost"
 out of memory and attempt to grow the stack (by calling functions, for example) then the system _MAY NOT TELL YOU_
 and your program's state will be corrupted. Thus in order to be able to recover from out of memory errors the program needs to have bounded
-stack size, and set the stacksize to the maximum value at the start of the program (because otherwise the stack could try and grow when you don't have any more memory). Additionally the library needs to never allocate anything on the OOM error handling path, and it probably needs to
-have special code to try and free memory. 
+stack size, and set the stacksize to the maximum value at the start of the program (because otherwise the stack could try and grow when you don't have any more memory). Additionally the library needs to never allocate anything on the OOM error handling path. You also need something to
+do to recover from OOM.
 
-
-
-~ Must
-Provide an error code for each error that the client library can produce.  Provide a list of constants to allow easy identification of error conditions.
-~
-
-~ Must
-include a clear indication of error conditions that a function can return, generally by returning `null` or `-1`.
-~
-
-~ Must
-Provide a function that returns rich information about the last error generated by the client library.  Name this function `shortname_last_error()`, where shortname is the short name for your client library.  In the case of HTTP errors, this function must return the originating request (URL, query parameters, and headers) and response (status code and headers).
-~
-
-~ Must
-Provide a function that returns the error code for the last error generated by the client library.  Name this function `shortname_last_error_code()`, where shortname is the short name for your client library.
-~
-
-~ Must
-produce an error when any HTTP request fails with an HTTP status code that is not defined by the service/Swagger as a successful status code. These errors should also be logged as errors.
-~
-
-~ Must
-document the errors that are produced by each method (with the exception of commonly thrown errors that are generally not documented in the target language).
-~
