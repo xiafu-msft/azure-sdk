@@ -142,7 +142,7 @@ most memory allocation functions will return an error or nullpointer if they fai
 "out of memory". If you need to allocate memory of a dynamic (user specified) size, or of an extremely large size, then
 failures of that allocation should always be treated as a recoverable error. However for small, compile-time
 constant sized allocations the decision of weather to treat a failure as an "Act of God" or a "Recoverable error" is more subtle
-and should be decided when you start a new library (with ARB consultation).
+and should be decided when you start a new library (with Architectural Review Board consultation).
 
 On some platforms, mainly those that overcommit, it's extremely hard to handle OOM gracefully. Additionally, if you are "almost"
 out of memory and attempt to grow the stack - by calling functions, for example - then the system _MIGHT NOT TELL YOU_
