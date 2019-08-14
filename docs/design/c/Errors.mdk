@@ -76,7 +76,7 @@ should we tell people to use some builtin facility for this, I'd lean toward jus
 ~
 
 ~ Must
-Provide a way to disable post condition checks, and omit them from the built library/executable.
+Provide a way to disable postcondition checks, and omit checking code from built binaries.
 ~
 
 #### Exhaustion / Act of God
