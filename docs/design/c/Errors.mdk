@@ -143,7 +143,7 @@ failures of that allocation should always be treated as a recoverable error. How
 constant sized allocations the decision of weather to treat a failure as an "Act of God" or a "Recoverable error" is more subtle
 and should be decided when you start a new library (with ARB consultation).
 
-On some platforms (mainly those that overcommit), it's extremely hard to handle OOM gracefully. Additionally if you are "almost"
+On some platforms, mainly those that overcommit, it's extremely hard to handle OOM gracefully. Additionally, if you are "almost"
 out of memory and attempt to grow the stack (by calling functions, for example) then the system _MAY NOT TELL YOU_
 and your program's state will be corrupted. Thus in order to be able to recover from out of memory errors the program needs to have bounded
 stack size, and set the stacksize to the maximum value at the start of the program (because otherwise the stack could try and grow when you don't have any more memory). Additionally the library needs to never allocate anything on the OOM error handling path. You also need something to
