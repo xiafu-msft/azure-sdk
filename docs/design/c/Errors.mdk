@@ -112,7 +112,7 @@ int az_catherding_has_cats(az_catherding_herd* herd, az_error* err) {
 }
 ```
 
-notice that by passing it's own `err` parameter through to `az_catherding_count_cats`, `az_catherding_has_cats` is able to
+notice that by passing its `err` parameter through to `az_catherding_count_cats`, `az_catherding_has_cats` is able to
 easily propagate errors back to it's own caller.
 
 A user calling such a function might look like:
