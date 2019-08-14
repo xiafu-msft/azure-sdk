@@ -26,7 +26,7 @@ We distinguish between several different types of errors:
 #### Pre Conditions
 
 ~ May
-Check for the error with an assert, or similar
+Check for the error with an assert, or similar.
 ~
 
 ~ Should
