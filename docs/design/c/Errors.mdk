@@ -103,7 +103,7 @@ int az_catherding_count_cats(az_catherding_herd* herd, az_error* err) {
 ```
 
 The function `az_error_set` sets the "domain" and error code of `err`; it is a precondition violation if `err` already contains
-an error. If err is NULL then az_error_set will call `az_panic`.
+an error. If `err` is `NULL` then `az_error_set` calls `az_panic`.
 
 A calling function from within the `az_catherding` library might look like:
 ```c
