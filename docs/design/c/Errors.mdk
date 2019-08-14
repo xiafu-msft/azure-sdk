@@ -113,9 +113,9 @@ int az_catherding_has_cats(az_catherding_herd* herd, az_error* err) {
 ```
 
 notice that by passing its `err` parameter through to `az_catherding_count_cats`, `az_catherding_has_cats` is able to
-easily propagate errors back to it's own caller.
+easily propagate errors back to its caller.
 
-A user calling such a function might look like:
+A user call to such a function might look like:
 ```c
 az_error err = {0};
 int cats = az_catherding_count_cats(herd, &err);
@@ -127,18 +127,18 @@ if(az_error_is_failure(&err)) {
 ~
 
 ~ Must
-produce a recoverable error when any HTTP request fails with an HTTP status code that is not defined by the service/Swagger as a successful status code.
+Produce a recoverable error when any HTTP request fails with an HTTP status code that is not defined by the service/Swagger as a successful status code.
 ~
 
 ~ Must
-Document all recoverable errors each function can gernerate directly. You don't need to document errors that you are simply propagating back to
+Document all recoverable errors each function generates directly. You don't need to document errors that you are simply propagating back to
 the caller.
 ~
 
 #### A Note on Out Of Memory
 
 We all want to be able to handle low memory situations gracefully and effectively, and C is "helpful" in that
-most memory allocation functions will return an error or nullpointer if they fail, including in the case of
+most memory allocation functions return an error or null pointer if they fail, including in the case of
 "out of memory". If you need to allocate memory of a dynamic (user specified) size, or of an extremely large size, then
 failures of that allocation should always be treated as a recoverable error. However for small, compile-time
 constant sized allocations the decision of weather to treat a failure as an "Act of God" or a "Recoverable error" is more subtle
