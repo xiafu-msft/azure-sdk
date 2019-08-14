@@ -82,7 +82,7 @@ Provide a way to disable postcondition checks, and omit checking code from built
 #### Exhaustion / Act of God
 
 ~ MustNot
-Attempt to return an error to the caller
+Return an error to the caller.
 ~
 
 ~ May
