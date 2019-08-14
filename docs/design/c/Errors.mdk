@@ -60,7 +60,7 @@ Provide an option to disable any checks, and omit checking code from built binar
 ~
 
 ~ Must
-Document all function preconditions. For conditions like "not null" a `[not nullable]` annotation is enough.
+Document all function preconditions. For conditions like "not null", a `[not nullable]` annotation is satisfactory.
 ~
 
 #### Post Conditions
