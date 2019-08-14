@@ -38,6 +38,7 @@ For example, if you're implementing a client for the Azure Catherding API you mi
 void az_catherding_default_panic_callback(void) {
   abort();
 }
+
 static thread_local void(*az_catherding_panic_callback)(void) = &az_catherding_default_panic_callback;
 void az_catherding_set_panic_callback(void(*panic_callback)(void)) {
   az_catherding_panic_callback = panic_callback;
