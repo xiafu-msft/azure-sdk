@@ -32,7 +32,7 @@ Check for the error with an assert, or similar.
 ~ Should
 Provide a user-settable callback function to be invoked upon the failure of a checked precondition.
 
-For example if you're implementing a client for the Azure Catherding API you might define:
+For example, if you're implementing a client for the Azure Catherding API you might define:
 
 ```c
 void az_catherding_default_panic_callback(void) {
