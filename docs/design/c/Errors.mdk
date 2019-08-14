@@ -86,7 +86,7 @@ Attempt to return an error to the caller
 ~
 
 ~ May
-Attempt to crash, if possible
+Crash, if possible.
 ~
 
 #### Recoverable Error
