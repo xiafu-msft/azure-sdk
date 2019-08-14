@@ -56,7 +56,7 @@ By default, any failures in checked preconditions should trigger a program crash
 ~
 
 ~ May
-Provide an option to disable any checks, and omit the code to preform them from built libraries/executables.
+Provide an option to disable any checks, and omit checking code from built binaries.
 ~
 
 ~ Must
