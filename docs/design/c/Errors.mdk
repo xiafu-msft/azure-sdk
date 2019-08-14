@@ -52,7 +52,7 @@ Note that it's important that the callback be thread local, since in some situat
 ~
 
 ~ Must
-By default, any failures in checked preconditions should trigger a program crash, with as much debugging information as feasible
+By default, any failures in checked preconditions should trigger a program crash, with as much debugging information as is feasible.
 ~
 
 ~ May
