@@ -146,6 +146,5 @@ and should be decided when you start a new library (with ARB consultation).
 On some platforms, mainly those that overcommit, it's extremely hard to handle OOM gracefully. Additionally, if you are "almost"
 out of memory and attempt to grow the stack (by calling functions, for example) then the system _MAY NOT TELL YOU_
 and your program's state will be corrupted. To recover from out of memory errors the program must have bounded
-stack size and must set the stack size to that bound at the start of the program. Additionally, the library must not allocate on the OOM error handling path. You also need something to
-do to recover from OOM.
+stack size and must set the stack size to that bound at the start of the program. Additionally, the library must not allocate on the OOM error handling path. 
 
