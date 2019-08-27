@@ -16,7 +16,8 @@ We distinguish between several different types of errors:
 * Exhaustion / Act of God
     : errors like running out of stack space, or dealing with power failure that, 
       in general, can not be anticipated and after which it may be hard to execute any more code,
-      let alone recover. Code handling these errors needs to be written to *very* specific requirements, for example not doing any allocations and never growing the stack. Or attempting to do a fast shutdown on UPS power.
+      let alone recover. Code handling these errors needs to be written to *very* specific requirements, 
+      for example not doing any allocations and never growing the stack.
 * Recoverable Error
     : Things like trying to open a file that doesn't exist, 
       or trying to write to a full disk. These kinds of errors can usually be handled by a function's caller directly, 
@@ -25,35 +26,36 @@ We distinguish between several different types of errors:
 
 #### Pre Conditions
 
-~ May
-Check for the error with an assert, or similar.
-~
-
 ~ Should
-Provide a user-settable callback function to be invoked upon the failure of a checked precondition.
+Check preconditions with a contract macro. For example:
 
-For example, if you're implementing a client for the Azure Catherding API you might define:
-
-```c
-void az_catherding_default_panic_callback(void) {
-  abort();
-}
-
-static thread_local void(*az_catherding_panic_callback)(void) = &az_catherding_default_panic_callback;
-void az_catherding_set_panic_callback(void(*panic_callback)(void)) {
-  az_catherding_panic_callback = panic_callback;
-}
-
-void az_catherding_panic() {
-  az_catherding_panic_callback();
-}
 ```
+#ifdef INCLUDE_CONTRACTS
+  #define CONTRACT_CHECK(x) \
+    do {\
+      if(!x) return az_panic_function();		\
+    } while(0);
+  #else
+  #define CONTRACT_CHECK(x)
+  #endif
+  az_error some_unction(int some_arg) {
+    CONTRACT_CHECK(some_arg > 0);
+  }
 
-Note that it's important that the callback be thread local, since in some situations you *can* kill the thread and continue execution.
+```
 ~
 
 ~ Must
-By default, any failures in checked preconditions should trigger a program crash, with as much debugging information as is feasible.
+Call a "panic function" on a (checked) precondition failure. This function should be either provided 
+by the user, or marked as a "weak symbol" if supported by the compiler.
+
+For example
+
+```c
+az_error az_panic() {
+  return AZ_ERROR_INVALID_ARGUMENT;
+}
+```
 ~
 
 ~ May
@@ -70,11 +72,6 @@ Document all function preconditions. For conditions like "not null", a `[not nul
 Check post-conditions in a way that changes the computational complexity of the function.
 ~
 
-~ ToDo
-should we tell people to use some builtin facility for this, I'd lean toward just having like
-`az_ensure(bool, char*)` functions / macros. Or using assert.
-~
-
 ~ Must
 Provide a way to disable postcondition checks, and omit checking code from built binaries.
 ~
@@ -89,41 +86,35 @@ Return an error to the caller.
 Crash, if possible.
 ~
 
+Note: if your client library needs to be resilient to these kinds of errors
+you must either provide a fallback system, or construct your code in a way
+to facilitate proving that such errors can not occur.
+
 #### Recoverable Error
 ~ Must
-Report recoverable errors by way of an additional output parameter named `err`. For example:
+Report errors via an error code enum. The core library defines such an enum called `az_error`
+
+For example:
+
 ```c
-int az_catherding_count_cats(az_catherding_herd* herd, az_error* err) {
+AZ_NODISCARD az_error az_catherding_count_cats(az_catherding_herd* herd, int* cats) {
   if(herd->has_shy_cats) {
-    az_error_set(err, AZ_CATHERDING_DOMAIN, AZ_CATHERDING_ERROR_HIDING_CATS);
-    return 0;
+    return AZ_ERROR_CATHERDING_HIDING_CATS;
   }
-  return herd->num_cats;
+  *cats = herd->num_cats;
+  return AZ_ERROR_SUCCESS;
 }
 ```
 
-The function `az_error_set` sets the "domain" and error code of `err`; it is a precondition violation if `err` already contains
-an error. If `err` is `NULL` then `az_error_set` calls `az_panic`.
+~
 
-A calling function from within the `az_catherding` library might look like:
-```c
-int az_catherding_has_cats(az_catherding_herd* herd, az_error* err) {
-  return az_catherding_count_cats(herd, err) > 0;
-}
-```
+~ Must
+Mark all functions returning errors as `AZ_NODISCARD` this will cause supported compilers to emit a warning
+if the caller ignores the error code.
+~
 
-notice that by passing its `err` parameter through to `az_catherding_count_cats`, `az_catherding_has_cats` is able to
-easily propagate errors back to its caller.
-
-A user call to such a function might look like:
-```c
-az_error err = {0};
-int cats = az_catherding_count_cats(herd, &err);
-if(az_error_is_failure(&err)) {
-  // handle the error
-}
-// do stuff with cats
-```
+~ Must
+Return `AZ_ERROR_SUCCESS` from successful functions, unless the function has no error conditions.
 ~
 
 ~ Must
@@ -131,8 +122,7 @@ Produce a recoverable error when any HTTP request fails with an HTTP status code
 ~
 
 ~ Must
-Document all recoverable errors each function generates directly. You don't need to document errors that you are simply propagating back to
-the caller.
+Document all recoverable errors each function generates.
 ~
 
 #### A Note on Out Of Memory
