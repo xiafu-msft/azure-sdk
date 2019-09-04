@@ -29,15 +29,15 @@ We distinguish between several different types of errors:
 ~ Should
 Check preconditions with a contract macro. For example:
 
-```
+```c
 #ifdef INCLUDE_CONTRACTS
-  #define CONTRACT_CHECK(x) \
-    do {\
-      if(!x) return az_panic_function();		\
+#  define CONTRACT_CHECK(x)                 \
+    do {                                    \
+      if(!(x)) return az_panic_function();	\
     } while(0);
-  #else
-  #define CONTRACT_CHECK(x)
-  #endif
+#else
+#  define CONTRACT_CHECK(x)
+#endif
   az_error some_unction(int some_arg) {
     CONTRACT_CHECK(some_arg > 0);
   }
@@ -92,7 +92,7 @@ to facilitate proving that such errors can not occur.
 
 #### Recoverable Error
 ~ Must
-Report errors via an error code enum. The core library defines such an enum called `az_error`
+Report errors via an error code enum. The core library defines such an enum called `az_error`.
 
 For example:
 
@@ -109,7 +109,7 @@ AZ_NODISCARD az_error az_catherding_count_cats(az_catherding_herd* herd, int* ca
 ~
 
 ~ Must
-Mark all functions returning errors as `AZ_NODISCARD` this will cause supported compilers to emit a warning
+Mark all functions returning errors as `AZ_NODISCARD`. This will cause supported compilers to emit a warning
 if the caller ignores the error code.
 ~
 
