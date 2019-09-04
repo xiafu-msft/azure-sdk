@@ -38,7 +38,7 @@ Check preconditions with a contract macro. For example:
 #else
 #  define CONTRACT_CHECK(x)
 #endif
-  az_error some_unction(int some_arg) {
+  az_result some_unction(int some_arg) {
     CONTRACT_CHECK(some_arg > 0);
   }
 
@@ -52,8 +52,8 @@ by the user, or marked as a "weak symbol" if supported by the compiler.
 For example
 
 ```c
-az_error az_panic() {
-  return AZ_ERROR_INVALID_ARGUMENT;
+az_result az_panic() {
+  return AZ_RESULT_INVALID_ARGUMENT;
 }
 ```
 ~
@@ -92,17 +92,17 @@ to facilitate proving that such errors can not occur.
 
 #### Recoverable Error
 ~ Must
-Report errors via an error code enum. The core library defines such an enum called `az_error`.
+Report errors via an error code enum. The core library defines such an enum called `az_result`.
 
 For example:
 
 ```c
-AZ_NODISCARD az_error az_catherding_count_cats(az_catherding_herd* herd, int* cats) {
+AZ_NODISCARD az_result az_catherding_count_cats(az_catherding_herd* herd, int* cats) {
   if(herd->has_shy_cats) {
-    return AZ_ERROR_CATHERDING_HIDING_CATS;
+    return AZ_RESULT_CATHERDING_HIDING_CATS;
   }
   *cats = herd->num_cats;
-  return AZ_ERROR_SUCCESS;
+  return AZ_RESULT_SUCCESS;
 }
 ```
 
@@ -114,7 +114,7 @@ if the caller ignores the error code.
 ~
 
 ~ Must
-Return `AZ_ERROR_SUCCESS` from successful functions, unless the function has no error conditions.
+Return `AZ_RESULT_SUCCESS` from successful functions, unless the function has no error conditions.
 ~
 
 ~ Must
