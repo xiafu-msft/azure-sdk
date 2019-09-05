@@ -109,11 +109,11 @@ For more information on what to return for `list` operations, refer to [Paginati
 
 For methods that combine multiple requests into a single call:
 
-{% include requirement/MUSTNOT id="android-response-return-headers" %} return headers and other per-request metadata unless it's obvious as to which specific HTTP request the methods return value corresponds to.
+{% include requirement/MUSTNOT id="ios-response-return-headers" %} return headers and other per-request metadata unless it's obvious as to which specific HTTP request the methods return value corresponds to.
 
-{% include requirement/MUST id="android-response-failure-cases" %} provide enough information in failure cases for an application to take appropriate corrective action.
+{% include requirement/MUST id="ios-response-failure-cases" %} provide enough information in failure cases for an application to take appropriate corrective action.
 
-{% include requirement/SHOULDNOT id="android-response-reserved-words" %} use reserved words (such as `object` and `value`) as a property name within the logical entity.  Avoid reserved words in other supported languages.
+{% include requirement/SHOULDNOT id="ios-response-reserved-words" %} use reserved words (such as `object` and `value`) as a property name within the logical entity.  Avoid reserved words in other supported languages.
 
 ## Pagination
 
@@ -262,6 +262,23 @@ For example, MQTT over WebSockets provides the ability to add headers during the
 {% include requirement/MUST id="android-proto-archboard" %} consult the [Architecture Board] on policy decisions for non-HTTP  protocols.  Implementation of all policies is expected.  If the protocol cannot support a policy, obtain an exception from the [Architecture Board].
 
 {% include requirement/MUST id="android-proto-global-config" %} use the global configuration established in the Azure Core library to configure policies for non-HTTP protocols.  Consumers don't necessarily know what protocol is used by the client library.  They will expect the client library to honor global configuration that they have established for the entire Azure SDK.  
+
+## The Swift API
+
+### Enums
+
+Use the following (example) form for enums:
+
+```swift
+@objc 
+public enum InkType: Int,RawRepresentable {
+    case Line
+    case Point
+}
+```
+
+Always make enums an `Int` type with no conversion within the enum.  This provides maximum compatibility with Objective-C.
+
 
 ## The Java API
 
