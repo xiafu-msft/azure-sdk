@@ -73,14 +73,30 @@ Combined operations require knowledge of additional operations that might be out
 
 ## Swift docstrings
 
-> **DEVIATION**
-> We need to work on how to generate docstrings.  Right now, suggest we document with Swift-flavored Markdown and generate the docs with [Jazzy](https://github.com/realm/jazzy): See https://www.appcoda.com/swift-markdown/
+{% include requirement/MUST id="ios-swift-docstrings" %} write docstrings in [XCode Markup](https://developer.apple.com/library/archive/documentation/Xcode/Reference/xcode_markup_formatting_ref/).  The code can then be post-processed to extract the docstrings for generating API reference documentation.
 
-> **DEVIATION**
-> Spirit of the requirement is to be able to build the documentation easily on cloning.
+{% include requirement/MUST id="ios-swift-build-apiref" %} ensure that anybody can clone the repo containing the client library and execute `jazzy` to generate the full and complete API reference output for the code, without any need for additional processing steps.
 
-{% include requirement/MUST id="ios-swift-docstrings" %} ensure that anybody can clone the repo containing the client library and execute `xcodebuild docs` to generate the full and complete API reference output for the code, without any need for additional processing steps.
+Add the following `.jazzy.yaml` file to the project:
 
+```
+output: docs
+clean: true
+xcodebuild_argument:
+- -workspace
+- YourWorkspaceName.xcworkspace
+- -scheme
+- YourSchemeName
+- CODE_SIGNING_ALLOWED = NO
+author: Microsoft, Inc.
+module: Folder_Name_where_all_code_resides
+module_version: 1.0
+copyright: Copyright (C) 2019 Microsoft, Inc.
+min_acl: internal
+theme: apple
+```
+
+Replace the `YourWorkspaceName`, `YourSchemeName`, and `Folder_Name_where_all_code_resides` appropriately for the project.
 
 {% include refs.md %}
 {% include_relative refs.md %}
