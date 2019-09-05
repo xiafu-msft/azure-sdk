@@ -5,6 +5,9 @@ Title Note  : Version 1.0.0
 Author      : Adrian Hall
 Affiliation : Azure SDK Team / PM
 Email       : adrian.hall@microsoft.com
+Author      : Charles Barto
+Affiliation : Visual C++ Team
+Email       : Charles.Barto@microsoft.com
 Author      : Mahmoud Saleh
 Affiliation : Visual C++ Team
 Email       : mahmoud.saleh@microsoft.com
@@ -21,7 +24,7 @@ css         : custom.css
 
 # Azure SDK design guidelines for the C language { -;  toc-line: '' }
 
-This document describes the architectural considerations and API design guidelines for the Azure SDK client libraries written in C.  The primary focus of these guidelines is to ensure that a client library developer can write code that targets the Azure supported IoT platforms.
+This document describes the architectural considerations and API design guidelines for the Azure SDK client libraries written in C.  The primary focus of these guidelines is to ensure that a client library developer can write code that targets the Azure supported embedded and IOT platforms, but should also be used for any other Azure C SDK API.
 
 [TOC]
 
@@ -42,7 +45,6 @@ This document describes the architectural considerations and API design guidelin
 
 The API surface of your client library must have the most thought as it is the primary interaction that the consumer has with your service.  
 
-[INCLUDE=./Namespace.mdk]
 [INCLUDE=./APIShape.mdk]
 [INCLUDE=./ResponseFormats.mdk]
 [INCLUDE=./Pagination.mdk]

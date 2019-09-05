@@ -17,9 +17,8 @@ include the following standard targets:
 * `docs` to generate reference documentation
 * `all` to run all three targets
 
-~
-
 Include other targets as they appear useful during the development process.
+~
 
 ~ ToDo
 should we be advising the use of valgrind, cppcheck, or other analysis tools (static or dynamic)?
@@ -99,14 +98,10 @@ Using `-i` does an in-place edit of the files for style.  Drop this argument if 
  to adjust style manually. There is 
  [a Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.llvm-toolchain) 
  that binds Ctrl-R Ctrl-F to this operation. Visual Studio 2019 includes this functionality by default.
+~
 
 ~ ToDo
 decide on exact formatting standards to use and include here.
-~
-~
-
-~ Must
-use [doxygen](https://doxygen.nl) for reference documentation for HTML.
 
 For example in CMake:
 ```CMake
@@ -139,10 +134,5 @@ endif()
 ~
 
 ~ MustNot
-Install examples by default
+Install examples by default.
 ~
-
-~
-
-
-
