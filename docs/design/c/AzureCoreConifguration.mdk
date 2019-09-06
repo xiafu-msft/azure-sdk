@@ -1,5 +1,25 @@
 ## Azure Core Configuration
 
+~ Should
+Prefer compile-time configuration options over runtime options
+~
+
+~ MustNot
+Create any compile-time option that changes ABI of the library, except for
+adding or removing symbols.
+
+Note: this is to prevent situations where my app uses libraries A, and B, both of which use
+some azure library (such as the core library), but libraries A and B were compiled with different
+options.
+~
+
+~ Should
+Store any runtime options in the client object. This is to avoid globals, and allow different options
+on different clients.
+~
+
+
+
 ~ ToDo
-Write the specs for Azure Core
+List configuration options for core library
 ~
